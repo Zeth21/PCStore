@@ -1,0 +1,6 @@
+@PCStore.API_HostAddress = http://localhost:5196
+
+GET {{PCStore.API_HostAddress}}/home/
+Accept: application/json
+
+###

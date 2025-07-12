@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PCStore.Persistence\PCStore.Persistence.csproj" />
+    <ProjectReference Include="..\PCStore.Domain\PCStore.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\CQRSDesignPattern\Commands\StatusNameCommands\" />
+    <Folder Include="Features\CQRSDesignPattern\Handlers\CategoryHandlers\" />
+    <Folder Include="Features\CQRSDesignPattern\Handlers\StatusNameHandlers\" />
+    <Folder Include="Features\CQRSDesignPattern\Handlers\ProductRateHandlers\" />
+    <Folder Include="Features\CQRSDesignPattern\Handlers\OrderStatusHandlers\" />
+    <Folder Include="Features\CQRSDesignPattern\Handlers\OrderProductListHandlers\" />
+    <Folder Include="Features\CQRSDesignPattern\Handlers\OrderHandlers\" />
+    <Folder Include="Features\CQRSDesignPattern\Handlers\NotificationHandlers\" />
+    <Folder Include="Features\CQRSDesignPattern\Queries\ProductAttributeQueries\" />
+    <Folder Include="Features\CQRSDesignPattern\Queries\ProductTypeAttributeQueries\" />
+    <Folder Include="Features\CQRSDesignPattern\Queries\ProductTypeQueries\" />
+    <Folder Include="Features\CQRSDesignPattern\Queries\StatusNameQueries\" />
+    <Folder Include="Features\CQRSDesignPattern\Queries\ProductRateQueries\" />
+    <Folder Include="Features\CQRSDesignPattern\Queries\OrderProductListQueries\" />
+    <Folder Include="Features\CQRSDesignPattern\Queries\OrderStatusQueries\" />
+    <Folder Include="Features\CQRSDesignPattern\Queries\OrderQueries\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\CategoryResults\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\CouponUsageResults\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\ProductTypeAttributeResults\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\StatusNameResults\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\ProductRateResults\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\OrderStatusResults\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\OrderProductListResults\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\OrderResults\" />
+    <Folder Include="Features\CQRSDesignPattern\Results\NotificationResults\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+  </ItemGroup>
+
+</Project>
