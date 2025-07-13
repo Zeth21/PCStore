@@ -15,12 +15,6 @@ namespace PCStore.Domain.Entities
         public required string UserId { get; set; }
         public User? User { get; set; }
 
-        public required string Province { get; set; }
-        public required string District { get; set; }
-        public required string Neighborhood { get; set; }
-        public required string Street { get; set; }
-        public required string BuildingNumber { get; set; }
-        public required string Floor { get; set; }
         public required string Description { get; set; }
 
         public ICollection<Order>? Orders { get; set; }

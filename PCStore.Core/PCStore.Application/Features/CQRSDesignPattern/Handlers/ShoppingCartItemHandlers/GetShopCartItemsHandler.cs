@@ -56,15 +56,12 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.ShoppingCartIt
                         result.TotalCouponDiscount = couponDiscount.TotalDiscount;
                 }
             }
-            var dtoList = mapper.Map<List<GetShopCartItemsResult>>(checkDiscount);
+            var dtoList = mapper.Map<List<GetShopCartItemsResult>>(products);
             foreach (var dto in dtoList)
             {
-                var product = products.Where(x => x.ProductId == dto.ProductId).SingleOrDefault();
-                if (product is not null)
-                {
-                    dto.Id = product.ShoppingCartItems!.FirstOrDefault()!.Id;
-                    dto.ItemCount = product.ShoppingCartItems!.FirstOrDefault()!.ItemCount;
-                }
+                var discProduct = checkDiscount.Where(x => x.ProductId == dto.ProductId).SingleOrDefault();
+                if(discProduct is not null)
+                    mapper.Map(discProduct, dto);
             }
             result.CartItems = dtoList;
             return TaskResult<BulkGetShopCartItemsResult>.Success("All products found successfully!", data: result);

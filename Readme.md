@@ -1,6 +1,6 @@
 # Modular E-Commerce API Backend built with ASP.NET Core (Onion Architecture, CQRS Pattern - MediatR)
 
-This is a **multi-layered backend API project** designed for the sale of computer hardware and accessories. It was developed for **educational purposes and CV building**, following clean code practices and modern architectural principles.
+This is a **multi-layered backend API project** designed for an e-commerce system. It was developed for **educational purposes and CV building**, following clean code practices and modern architectural principles.
 
 ## Technologies and Architectures Used
 

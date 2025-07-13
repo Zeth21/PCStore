@@ -178,6 +178,9 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
             CreateMap<DiscountValidatorResult, GetProductInformationsResult>();
             CreateMap<DiscountValidatorResult, GetShopCartItemsResult>();
             CreateMap<DiscountValidatorResult, CouponValidatorCommand>();
+            CreateMap<Product, GetShopCartItemsResult>()
+                .ForMember(x => x.Id, s => s.MapFrom(o => o.ShoppingCartItems!.FirstOrDefault()!.Id))
+                .ForMember(x => x.ItemCount, s => s.MapFrom(o => o.ShoppingCartItems!.FirstOrDefault()!.ItemCount));
         }
     }
 }

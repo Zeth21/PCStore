@@ -13,12 +13,7 @@ namespace PCStore.Domain.IdentityFaker
             var addressFaker = new Faker<Address>()
                 .RuleFor(a => a.UserId, f => f.PickRandom(users).Id)
                 .RuleFor(a => a.AddressName, f => f.Address.StreetName())
-                .RuleFor(a => a.District, f => f.Address.City())
-                .RuleFor(a => a.Neighborhood, f => f.Address.City())
-                .RuleFor(a => a.BuildingNumber, f => f.Address.BuildingNumber())
-                .RuleFor(a => a.Floor, f => f.PickRandom("1", "2", "3", "4"))
-                .RuleFor(a => a.Description, f => f.Address.FullAddress())
-                .RuleFor(a => a.Street, f => f.Address.City());
+                .RuleFor(a => a.Description, f => f.Address.FullAddress());
             for (int i = 0; i < count; i++)
             {
                 var address = addressFaker.Generate();
