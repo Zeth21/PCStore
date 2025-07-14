@@ -30,41 +30,51 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.ShoppingCartIt
                 .AnyAsync(x => x.Id == request.UserId);
             if (!userExists)
                 return TaskResult<BulkGetShopCartItemsResult>.Fail("Invalid user!");
-            var products = await context.Products
-                .Include(x => x.ShoppingCartItems)
-                .Where(x => x.ShoppingCartItems != null && x.ShoppingCartItems.Any(sc => sc.UserId == request.UserId))
+            var shopCartItems = await context.ShoppingCartItems
+                .Include(x => x.Product)
+                    .ThenInclude(p => p!.Brand)
+                .Include(x => x.Product)
+                    .ThenInclude(p => p!.Category)
+                .Where(x => x.UserId == request.UserId)
                 .ToListAsync(cancellationToken);
-            if (products.Count == 0)
-                return TaskResult<BulkGetShopCartItemsResult>.NotFound("No products found!");
-            var result = new BulkGetShopCartItemsResult();
-            var checkDiscount = await checker.CheckDiscount(mapper.Map<List<DiscountValidatorCommand>>(products));
-            var couponProductList = mapper.Map<List<CouponValidatorCommand>>(checkDiscount);
-            if (request.CouponId is not null)
+            if (shopCartItems.Count <= 0)
+                return TaskResult<BulkGetShopCartItemsResult>.NotFound("No products found in the cart!");
+            var products = shopCartItems.Select(x => x.Product).ToList();
+            var checkDiscountList = await checker.CheckDiscount(mapper.Map<List<DiscountValidatorCommand>>(products));
+            var resultList = mapper.Map<List<GetShopCartItemsResult>>(shopCartItems);
+            foreach (var product in resultList)
             {
-                foreach (var item in couponProductList)
+                var checkDiscount = checkDiscountList.FirstOrDefault(x => x.ProductId == product.ProductId);
+                if (checkDiscount is not null)
+                    mapper.Map(checkDiscount, product);
+            }
+            var result = new BulkGetShopCartItemsResult { };
+            if (request.CouponId is not null && request.CouponId != 0)
+            {
+                var coupon = await context.Coupons
+                    .SingleOrDefaultAsync(x => x.CouponId == request.CouponId);
+                if (coupon is null)
+                    return TaskResult<BulkGetShopCartItemsResult>.Fail("Invalid coupon!");
+                var validator = validatorFactory.GetValidator(coupon.CouponTargetType);
+                var validatorList = mapper.Map<List<CouponValidatorCommand>>(resultList);
+                foreach(var item in validatorList) 
                 {
-                    var product = products.Where(x => x.ProductId == item.ProductId).SingleOrDefault();
-                    if (product is not null)
-                        item.ItemCount = product.ShoppingCartItems!.FirstOrDefault()!.ItemCount;
+                    var product = products.SingleOrDefault(x => x!.ProductId == item.ProductId);
+                    if(product is not null) 
+                    {
+                        item.ProductTypeId = product.ProductTypeId;
+                        item.ProductBrandId = product.ProductBrandId;
+                        item.ProductCategoryId = product.ProductCategoryId;
+                    }
                 }
-                var coupon = await context.Coupons.FindAsync(request.CouponId, cancellationToken);
-                if (coupon is not null)
+                var validatorResult = await validator.IsValid(request.UserId, coupon,validatorList);
+                if (validatorResult.IsValid)
                 {
-                    var validator = validatorFactory.GetValidator(coupon.CouponTargetType);
-                    var couponDiscount = await validator.IsValid(request.UserId, coupon, couponProductList);
-                    if (couponDiscount.IsValid)
-                        result.TotalCouponDiscount = couponDiscount.TotalDiscount;
+                    result.TotalCouponDiscount = validatorResult.TotalDiscount;
                 }
             }
-            var dtoList = mapper.Map<List<GetShopCartItemsResult>>(products);
-            foreach (var dto in dtoList)
-            {
-                var discProduct = checkDiscount.Where(x => x.ProductId == dto.ProductId).SingleOrDefault();
-                if(discProduct is not null)
-                    mapper.Map(discProduct, dto);
-            }
-            result.CartItems = dtoList;
-            return TaskResult<BulkGetShopCartItemsResult>.Success("All products found successfully!", data: result);
+            result.CartItems = resultList;
+            return TaskResult<BulkGetShopCartItemsResult>.Success("All products found successfully!",data:result);
         }
 
     }

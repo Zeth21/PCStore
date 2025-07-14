@@ -125,6 +125,7 @@ builder.Services.AddScoped<ICouponValidator, SpecificProductsCouponValidator>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IDiscountProductService, DiscountProductService>();
 builder.Services.AddScoped<ICouponValidatorFactory, CouponValidatorFactory>();
+builder.Services.AddScoped<IDiscountUsageCalculator, DiscountUsageCalculator>();
 builder.Services.AddAuthorization();
 builder.Services.Configure<SmtpSettings>(
     builder.Configuration.GetSection("SmtpSettings"));

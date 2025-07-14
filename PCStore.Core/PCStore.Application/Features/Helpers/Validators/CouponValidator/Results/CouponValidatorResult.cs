@@ -12,15 +12,13 @@ namespace PCStore.Application.Features.Helpers.Validators.CouponValidator.Result
         public bool IsValid { get; set; }
         public decimal? TotalDiscount { get; set; }
         public required string Message { get; set; }
-        public List<CouponValidatorCommand>? Data { get; set; }
-        public static CouponValidatorResult Valid(List<CouponValidatorCommand>? data = null, decimal? totalDiscount = null, string message = "Coupon is valid!") 
+        public static CouponValidatorResult Valid( decimal? totalDiscount = null, string message = "Coupon is valid!") 
         {
             return new CouponValidatorResult
             {
                 IsValid = true,
                 Message = message,
-                TotalDiscount = totalDiscount,
-                Data = data
+                TotalDiscount = totalDiscount
             };
         }
 

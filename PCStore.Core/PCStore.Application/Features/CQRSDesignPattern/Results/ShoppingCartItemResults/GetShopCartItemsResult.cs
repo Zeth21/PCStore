@@ -11,6 +11,8 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Results.ShoppingCartIte
         public int Id { get; set; }
         public int ProductId { get; set; }
         public required string ProductName { get; set; }
+        public required string BrandName { get; set; }
+        public required string CategoryName { get; set; }
         public int ItemCount { get; set; }
         public decimal ProductPrice { get; set; }
         public required string ProductMainPhotoPath { get; set; }

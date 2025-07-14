@@ -33,7 +33,7 @@ namespace PCStore.API.Controllers
             return StatusCode(result.StatusCode,result);
         }
 
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer,Admin")]
         [HttpGet]
         public async Task<IActionResult> GetShopCartItems([FromQuery]int? couponId,CancellationToken cancellation = default) 
         {

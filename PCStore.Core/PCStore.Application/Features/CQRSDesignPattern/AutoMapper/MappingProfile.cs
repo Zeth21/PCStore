@@ -178,9 +178,24 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
             CreateMap<DiscountValidatorResult, GetProductInformationsResult>();
             CreateMap<DiscountValidatorResult, GetShopCartItemsResult>();
             CreateMap<DiscountValidatorResult, CouponValidatorCommand>();
-            CreateMap<Product, GetShopCartItemsResult>()
-                .ForMember(x => x.Id, s => s.MapFrom(o => o.ShoppingCartItems!.FirstOrDefault()!.Id))
-                .ForMember(x => x.ItemCount, s => s.MapFrom(o => o.ShoppingCartItems!.FirstOrDefault()!.ItemCount));
+            CreateMap<Product, GetShopCartItemsResult>();
+            CreateMap<ShoppingCartItem, GetShopCartItemsResult>()
+                .ForMember(x => x.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(x => x.ProductMainPhotoPath, o => o.MapFrom(s => s.Product!.ProductMainPhotoPath))
+                .ForMember(x => x.ProductRateScore, o => o.MapFrom(s => s.Product!.ProductRateScore))
+                .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.Product!.ProductPrice))
+                .ForMember(x => x.ProductId, o => o.MapFrom(s => s.Product!.ProductId))
+                .ForMember(x => x.ItemCount, o => o.MapFrom(s => s.ItemCount))
+                .ForMember(x => x.ProductName, o => o.MapFrom(s => s.Product!.ProductName))
+                .ForMember(x => x.ProductTotalRate, o => o.MapFrom(s => s.Product!.ProductTotalRate))
+                .ForMember(x => x.CategoryName, o => o.MapFrom(s => s.Product!.Category!.CategoryName))
+                .ForMember(x => x.BrandName, o => o.MapFrom(s => s.Product!.Brand!.BrandName));
+            CreateMap<GetShopCartItemsResult, CouponValidatorCommand>()
+                .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
+                .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.ProductPrice))
+                .ForMember(x => x.ProductBrandId, o => o.Ignore())
+                .ForMember(x => x.ProductCategoryId, o => o.Ignore())
+                .ForMember(x => x.ProductTypeId, o => o.Ignore());
         }
     }
 }
