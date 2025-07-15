@@ -16,9 +16,7 @@
     <Folder Include="Features\CQRSDesignPattern\Handlers\CategoryHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\StatusNameHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\ProductRateHandlers\" />
-    <Folder Include="Features\CQRSDesignPattern\Handlers\OrderStatusHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\OrderProductListHandlers\" />
-    <Folder Include="Features\CQRSDesignPattern\Handlers\OrderHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\NotificationHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductAttributeQueries\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductTypeAttributeQueries\" />
@@ -33,9 +31,7 @@
     <Folder Include="Features\CQRSDesignPattern\Results\ProductTypeAttributeResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\StatusNameResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\ProductRateResults\" />
-    <Folder Include="Features\CQRSDesignPattern\Results\OrderStatusResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\OrderProductListResults\" />
-    <Folder Include="Features\CQRSDesignPattern\Results\OrderResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\NotificationResults\" />
   </ItemGroup>
 

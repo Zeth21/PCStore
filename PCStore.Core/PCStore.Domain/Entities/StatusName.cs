@@ -9,7 +9,7 @@ namespace PCStore.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int StatusNameId { get; set; }
-        public string? StatusNameString { get; set; }
+        public required string StatusNameString { get; set; }
 
         [JsonIgnore]
         public ICollection<OrderStatus>? OrderStatues { get; set; }
