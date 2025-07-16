@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.OrderStatusHandlers
 {
-    public class CreateOrderStatusHandler(ProjectDbContext context, IMapper mapper) : IRequestHandler<CreateOrderStatusCommand, TaskResult<CreateOrderStatusResult>>
+    public class CreateOrderStatusHandler(ProjectDbContext context) : IRequestHandler<CreateOrderStatusCommand, TaskResult<CreateOrderStatusResult>>
     {
         public async Task<TaskResult<CreateOrderStatusResult>> Handle(CreateOrderStatusCommand request, CancellationToken cancellationToken)
         {

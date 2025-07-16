@@ -16,7 +16,6 @@
     <Folder Include="Features\CQRSDesignPattern\Handlers\CategoryHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\StatusNameHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\ProductRateHandlers\" />
-    <Folder Include="Features\CQRSDesignPattern\Handlers\OrderProductListHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\NotificationHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductAttributeQueries\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductTypeAttributeQueries\" />
@@ -31,8 +30,8 @@
     <Folder Include="Features\CQRSDesignPattern\Results\ProductTypeAttributeResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\StatusNameResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\ProductRateResults\" />
-    <Folder Include="Features\CQRSDesignPattern\Results\OrderProductListResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\NotificationResults\" />
+    <Folder Include="Services\OrderService\Results\" />
   </ItemGroup>
 
   <ItemGroup>
