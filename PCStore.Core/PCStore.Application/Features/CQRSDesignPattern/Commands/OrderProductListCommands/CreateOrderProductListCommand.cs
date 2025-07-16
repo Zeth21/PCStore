@@ -1,11 +1,23 @@
-﻿namespace PCStore.Application.Features.CQRSDesignPattern.Commands.OrderProductListCommands
+﻿using MediatR;
+using PCStore.Application.Features.CQRSDesignPattern.Results;
+using PCStore.Application.Features.CQRSDesignPattern.Results.OrderProductListResults;
+
+namespace PCStore.Application.Features.CQRSDesignPattern.Commands.OrderProductListCommands
 {
-    public class CreateOrderProductListCommand
+    public class CreateOrderProductListCommand : IRequest<Result>
+    {
+        public int OrderId { get; set; }
+        public List<OrderProductListDTO> OrderProducts { get; set; } = new();
+
+    }
+
+    public class OrderProductListDTO 
     {
         public int ProductId { get; set; }
         public byte ProductQuantity { get; set; }
-        public int ProductCost { get; set; }
-        public int OrderId { get; set; }
-
+        public decimal ProductTotalCost { get; set; }
+        public decimal ProductPrice { get; set; }
+        public decimal? ProductOldPrice { get; set; }
+        public decimal? ProductOldTotalCost { get; set; }
     }
 }

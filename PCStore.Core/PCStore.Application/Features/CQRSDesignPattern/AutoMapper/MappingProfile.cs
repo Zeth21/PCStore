@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PCStore.Application.Features.CQRSDesignPattern.Commands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AnswerCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AnswerVoteCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AttributeDefinitionCommands;
@@ -10,6 +11,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponProductTypeCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CreateShoppingCartItemsCommand;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.DiscountCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.DiscountUsageCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.ProductCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AnswerResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AttributeDefinitionResults;
@@ -196,6 +198,12 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.ProductBrandId, o => o.Ignore())
                 .ForMember(x => x.ProductCategoryId, o => o.Ignore())
                 .ForMember(x => x.ProductTypeId, o => o.Ignore());
+            CreateMap<CreateCouponUsageCommand, CouponUsage>()
+                .ForMember(x => x.CouponUsageCouponId, o => o.MapFrom(s => s.CouponId))
+                .ForMember(x => x.CouponUsageUserId, o => o.MapFrom(s => s.UserId))
+                .ForMember(x => x.CouponUsageOrderId, o => o.MapFrom(s => s.OrderId))
+                .ForMember(x => x.DiscountTotal, o => o.MapFrom(s => s.DiscountTotal));
+            CreateMap<CreateDiscountUsageCommand, DiscountUsage>();
         }
     }
 }

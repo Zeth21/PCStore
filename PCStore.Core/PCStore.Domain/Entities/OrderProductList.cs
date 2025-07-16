@@ -12,6 +12,7 @@ namespace PCStore.Domain.Entities
         public decimal ProductTotalCost { get; set; }
         public decimal ProductPrice { get; set; }
         public decimal? ProductOldPrice { get; set; }
+        public decimal? ProductOldTotalCost { get; set; }
         public int OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
         public Order? Order { get; set; }
