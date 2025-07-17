@@ -5,7 +5,7 @@ namespace PCStore.Domain.Entities
 {
     public class OrderProductList
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity), ForeignKey("OrderId")]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ListId { get; set; }
         public int ProductId { get; set; }
         public byte ProductQuantity { get; set; }
@@ -14,6 +14,7 @@ namespace PCStore.Domain.Entities
         public decimal? ProductOldPrice { get; set; }
         public decimal? ProductOldTotalCost { get; set; }
         public int OrderId { get; set; }
+
         [ForeignKey(nameof(OrderId))]
         public Order? Order { get; set; }
 

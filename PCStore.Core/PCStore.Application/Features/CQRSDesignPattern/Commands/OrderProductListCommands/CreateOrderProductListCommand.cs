@@ -7,7 +7,7 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Commands.OrderProductLi
     public class CreateOrderProductListCommand : IRequest<Result>
     {
         public int OrderId { get; set; }
-        public List<OrderProductListDTO> OrderProducts { get; set; } = new();
+        public required List<OrderProductListDTO> OrderProducts { get; set; }
 
     }
 

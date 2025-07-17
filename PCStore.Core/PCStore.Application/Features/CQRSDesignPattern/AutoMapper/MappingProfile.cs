@@ -206,7 +206,6 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.CouponUsageUserId, o => o.MapFrom(s => s.UserId))
                 .ForMember(x => x.CouponUsageOrderId, o => o.MapFrom(s => s.OrderId))
                 .ForMember(x => x.DiscountTotal, o => o.MapFrom(s => s.DiscountTotal));
-            CreateMap<CreateDiscountUsageCommand, DiscountUsage>();
             CreateMap<CreateOrderCommand, Order>();
             CreateMap<Order, CreateOrderResult>();
             CreateMap<GetShopCartItemsResult, OrderProductListDTO>()
@@ -218,7 +217,6 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.ProductTotalCost, o => o.MapFrom(s => s.TotalPrice));
             CreateMap<OrderProductListDTO, OrderProductList>()
                 .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
-                .ForMember(x => x.OrderId, o => o.Ignore())
                 .ForMember(x => x.ProductOldPrice, o => o.MapFrom(s => s.ProductOldPrice))
                 .ForMember(x => x.ProductOldTotalCost, o => o.MapFrom(s => s.ProductOldTotalCost))
                 .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.ProductPrice))
@@ -226,7 +224,6 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.ProductTotalCost, o => o.MapFrom(s => s.ProductTotalCost));
             CreateMap<DiscountUsageCalculatorResult, DiscountUsage>()
                 .ForMember(x => x.DiscountId, o => o.MapFrom(s => s.DiscountId))
-                .ForMember(x => x.OrderId, o => o.MapFrom(s => s.OrderId))
                 .ForMember(x => x.DiscountTotal, o => o.MapFrom(s => s.DiscountTotal));
         }
     }

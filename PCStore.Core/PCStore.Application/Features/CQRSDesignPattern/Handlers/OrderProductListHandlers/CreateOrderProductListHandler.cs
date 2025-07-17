@@ -28,8 +28,9 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.OrderProductLi
             try 
             {
                 await context.OrderProductLists.AddRangeAsync(newRecords,cancellationToken);
-                await context.SaveChangesAsync(cancellationToken);
-                var ids = newRecords.Select(x => x.ListId).ToList();
+                var task = await context.SaveChangesAsync(cancellationToken);
+                if (task != newRecords.Count)
+                    return Result.Fail("OrderProductList couldn't save the data!");
                 return Result.Success("Successfull!");
             }
             catch(Exception ex) 

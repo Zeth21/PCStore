@@ -23,15 +23,16 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.DiscountUsageH
             foreach(var usage in discountUsages) 
             {
                 usage.OrderId = request.OrderId;
-            };
+            }
             if (discountUsages.Count <= 0)
                 return Result.Success("No discounts found!");
             try 
             {
                 var newRecords = mapper.Map<List<DiscountUsage>>(discountUsages);
                 await context.DiscountUsages.AddRangeAsync(newRecords,cancellationToken);
-                await context.SaveChangesAsync(cancellationToken);
-                var ids = newRecords.Select(x => x.Id).ToList();
+                var task = await context.SaveChangesAsync(cancellationToken);
+                if (task != newRecords.Count)
+                    return Result.Fail("DiscountUsage couldn't save the data!");
                 return Result.Success("All discount usages created successfully!");
             }
             catch(Exception ex) 

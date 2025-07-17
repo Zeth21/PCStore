@@ -67,22 +67,6 @@ namespace PCStore.Application.Services.OrderService
                 {
                     UserId = request.UserId
                 };
-                if (request.CouponId is not null && shopCartItemsResult.Data.TotalCouponDiscount is not null) 
-                {
-                    var couponUsageCommand = new CreateCouponUsageCommand
-                    {
-                        CouponId = (int)request.CouponId,
-                        UserId = request.UserId,
-                        OrderId = orderResult.Data.OrderId,
-                        DiscountTotal = (decimal)shopCartItemsResult.Data.TotalCouponDiscount
-                    };
-                    var couponUsageResult = await mediator.Send(couponUsageCommand, cancellation);
-                    if (!couponUsageResult.IsSucceeded) 
-                    {
-                        await transaction.RollbackAsync(cancellation);
-                        return TaskResult<ServiceCreateOrderResult>.Fail("Invalid coupon!");
-                    }
-                }
                 var orderProductListResult = await mediator.Send(orderProductListCommand, cancellation);
                 var orderStatusResult = await mediator.Send(orderStatusCommand, cancellation);
                 var discountUsageResult = await mediator.Send(discountUsageCommand, cancellation);
@@ -100,6 +84,22 @@ namespace PCStore.Application.Services.OrderService
                         errors.Add(orderProductListResult.Message ?? "RemoveAllShopCartItems error!");
                     await transaction.RollbackAsync(cancellation);
                     return TaskResult<ServiceCreateOrderResult>.Fail("One or more errors occured!",errors:errors);
+                }
+                if (request.CouponId is not null && shopCartItemsResult.Data.TotalCouponDiscount is not null)
+                {
+                    var couponUsageCommand = new CreateCouponUsageCommand
+                    {
+                        CouponId = (int)request.CouponId,
+                        UserId = request.UserId,
+                        OrderId = orderResult.Data.OrderId,
+                        DiscountTotal = (decimal)shopCartItemsResult.Data.TotalCouponDiscount
+                    };
+                    var couponUsageResult = await mediator.Send(couponUsageCommand, cancellation);
+                    if (!couponUsageResult.IsSucceeded)
+                    {
+                        await transaction.RollbackAsync(cancellation);
+                        return TaskResult<ServiceCreateOrderResult>.Fail("Invalid coupon!");
+                    }
                 }
                 var result = new ServiceCreateOrderResult
                 {

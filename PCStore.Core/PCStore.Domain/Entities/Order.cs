@@ -18,13 +18,13 @@ namespace PCStore.Domain.Entities
 
         [ForeignKey(nameof(OrderAddressId))]
         public Address? Address { get; set; }
-        public OrderProductList? OrderProductList { get; set; }
+        public ICollection<OrderProductList>? OrderProductList { get; set; }
 
         [ForeignKey("OrderUserId")]
         public User? User { get; set; }
 
         public ICollection<OrderStatus>? OrderStatus { get; set; }
         public CouponUsage? CouponUsage { get; set; }
-        public DiscountUsage? DiscountUsage { get; set; }
+        public ICollection<DiscountUsage>? DiscountUsage { get; set; }
     }
 }
