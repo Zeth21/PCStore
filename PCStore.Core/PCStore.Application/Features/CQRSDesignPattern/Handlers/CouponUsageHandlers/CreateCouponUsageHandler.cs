@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using PCStore.Application.Features.CQRSDesignPattern.Commands;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponUsageCommand;
 using PCStore.Application.Features.CQRSDesignPattern.Results;
 using PCStore.Domain.Entities;
 using PCStore.Persistence.Context;

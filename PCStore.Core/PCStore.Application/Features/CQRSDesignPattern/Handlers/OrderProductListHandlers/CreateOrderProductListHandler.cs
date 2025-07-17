@@ -24,13 +24,12 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.OrderProductLi
             foreach(var record in newRecords) 
             {
                 record.OrderId = request.OrderId;
-            };
+            }
             try 
             {
                 await context.OrderProductLists.AddRangeAsync(newRecords,cancellationToken);
-                var task = await context.SaveChangesAsync(cancellationToken);
-                if (task < newRecords.Count)
-                    return Result.Fail("One or more products are invalid!");
+                await context.SaveChangesAsync(cancellationToken);
+                var ids = newRecords.Select(x => x.ListId).ToList();
                 return Result.Success("Successfull!");
             }
             catch(Exception ex) 

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using PCStore.Application.Features.CQRSDesignPattern.Commands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AnswerCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AnswerVoteCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AttributeDefinitionCommands;
@@ -9,9 +8,12 @@ using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponBrandCommand
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponCategoryCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponProductTypeCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponUsageCommand;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CreateShoppingCartItemsCommand;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.DiscountCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.DiscountUsageCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderProductListCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.ProductCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AnswerResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AttributeDefinitionResults;
@@ -24,6 +26,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Results.CouponResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountProductResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.FollowedProductResults;
+using PCStore.Application.Features.CQRSDesignPattern.Results.OrderResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.ProductAttributeResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.ProductPhotoResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.ProductResults;
@@ -204,6 +207,27 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.CouponUsageOrderId, o => o.MapFrom(s => s.OrderId))
                 .ForMember(x => x.DiscountTotal, o => o.MapFrom(s => s.DiscountTotal));
             CreateMap<CreateDiscountUsageCommand, DiscountUsage>();
+            CreateMap<CreateOrderCommand, Order>();
+            CreateMap<Order, CreateOrderResult>();
+            CreateMap<GetShopCartItemsResult, OrderProductListDTO>()
+                .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
+                .ForMember(x => x.ProductOldPrice, o => o.MapFrom(s => s.OldPrice))
+                .ForMember(x => x.ProductOldTotalCost, o => o.MapFrom(s => s.OldTotalPrice))
+                .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.ProductPrice))
+                .ForMember(x => x.ProductQuantity, o => o.MapFrom(s => s.ItemCount))
+                .ForMember(x => x.ProductTotalCost, o => o.MapFrom(s => s.TotalPrice));
+            CreateMap<OrderProductListDTO, OrderProductList>()
+                .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
+                .ForMember(x => x.OrderId, o => o.Ignore())
+                .ForMember(x => x.ProductOldPrice, o => o.MapFrom(s => s.ProductOldPrice))
+                .ForMember(x => x.ProductOldTotalCost, o => o.MapFrom(s => s.ProductOldTotalCost))
+                .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.ProductPrice))
+                .ForMember(x => x.ProductQuantity, o => o.MapFrom(s => s.ProductQuantity))
+                .ForMember(x => x.ProductTotalCost, o => o.MapFrom(s => s.ProductTotalCost));
+            CreateMap<DiscountUsageCalculatorResult, DiscountUsage>()
+                .ForMember(x => x.DiscountId, o => o.MapFrom(s => s.DiscountId))
+                .ForMember(x => x.OrderId, o => o.MapFrom(s => s.OrderId))
+                .ForMember(x => x.DiscountTotal, o => o.MapFrom(s => s.DiscountTotal));
         }
     }
 }

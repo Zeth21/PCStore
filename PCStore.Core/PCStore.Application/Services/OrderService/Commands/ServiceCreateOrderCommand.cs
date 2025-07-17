@@ -10,5 +10,6 @@ namespace PCStore.Application.Services.OrderService.Commands
     {
         public required string UserId { get; set; }
         public int? CouponId { get; set; }
+        public int AddressId { get; set; }
     }
 }

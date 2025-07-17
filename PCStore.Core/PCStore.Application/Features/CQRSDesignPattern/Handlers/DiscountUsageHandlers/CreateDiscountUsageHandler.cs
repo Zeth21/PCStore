@@ -30,9 +30,8 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.DiscountUsageH
             {
                 var newRecords = mapper.Map<List<DiscountUsage>>(discountUsages);
                 await context.DiscountUsages.AddRangeAsync(newRecords,cancellationToken);
-                var task = await context.SaveChangesAsync(cancellationToken);
-                if (task < newRecords.Count)
-                    return Result.Fail("One or more usages are invalid!");
+                await context.SaveChangesAsync(cancellationToken);
+                var ids = newRecords.Select(x => x.Id).ToList();
                 return Result.Success("All discount usages created successfully!");
             }
             catch(Exception ex) 

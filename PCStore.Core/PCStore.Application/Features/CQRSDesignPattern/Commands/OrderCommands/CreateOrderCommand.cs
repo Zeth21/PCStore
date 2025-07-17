@@ -15,7 +15,6 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Commands.OrderCommands
         public required string UserId { get; set; }
         public required int OrderAddressId { get; set; }
         public decimal OrderTotalCost { get; set; }
-        public int? CouponId { get; set; }
 
         [JsonIgnore]
         public DateTime OrderDate { get; set; } = DateTime.Now;
