@@ -18,9 +18,17 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.OrderStatusHan
     {
         public async Task<TaskResult<CreateOrderStatusResult>> Handle(CreateOrderStatusCommand request, CancellationToken cancellationToken)
         {
-            var statusName = await context.StatusNames.Where(x => x.StatusNameId == request.StatusNameId).Select(x => x.StatusNameString).SingleOrDefaultAsync();
+            var statusName = await context.StatusNames
+                .Where(x => x.StatusNameId == request.StatusNameId)
+                .Select(x => x.StatusNameString)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(cancellationToken);
             if (statusName is null)
                 return TaskResult<CreateOrderStatusResult>.Fail("Invalid status name!");
+            var order = await context.Orders
+                .SingleOrDefaultAsync(x => x.OrderId == request.OrderId);
+            if (order is null)
+                return TaskResult<CreateOrderStatusResult>.Fail("Order not found!");
             var newRecord = new OrderStatus 
             { 
                 OrderId = request.OrderId,

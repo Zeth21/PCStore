@@ -15,7 +15,6 @@ namespace PCStore.Domain.Entities
         public short ProductStock { get; set; }
         public int ProductBrandId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-
         public int ProductCategoryId { get; set; }
         public bool ProductIsAvailable { get; set; } = true;
         public int ProductTotalRate { get; set; } = 0;

@@ -1,4 +1,6 @@
-﻿using PCStore.Application.Features.CQRSDesignPattern.Results;
+﻿using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderStatusCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Results;
+using PCStore.Application.Features.CQRSDesignPattern.Results.OrderStatusResults;
 using PCStore.Application.Services.OrderService.Commands;
 using PCStore.Application.Services.OrderService.Results;
 using System;
@@ -11,7 +13,12 @@ namespace PCStore.Application.Services.OrderService
 {
     public interface IOrderService
     {
+        //ORDER
         Task<TaskResult<ServiceCreateOrderResult>> CreateOrder(ServiceCreateOrderCommand request, CancellationToken cancellation);
         Task<TaskResult<ServiceGetOrderDetailsByOrderIdResult>> UserGetOrderById(ServiceGetOrderDetailsByOrderIdCommand request, CancellationToken cancellation);
+
+
+        //ORDERSTATUS
+        Task<TaskResult<CreateOrderStatusResult>> CreateOrderStatus(CreateOrderStatusCommand request, CancellationToken cancellation);
     }
 }

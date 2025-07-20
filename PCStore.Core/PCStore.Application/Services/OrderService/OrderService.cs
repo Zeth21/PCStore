@@ -13,6 +13,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderQueries;
 using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderStatusQueries;
 using PCStore.Application.Features.CQRSDesignPattern.Queries.ShoppingCartItemsQueries;
 using PCStore.Application.Features.CQRSDesignPattern.Results;
+using PCStore.Application.Features.CQRSDesignPattern.Results.OrderStatusResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.ShoppingCartItemResults;
 using PCStore.Application.Services.OrderService.Commands;
 using PCStore.Application.Services.OrderService.Results;
@@ -122,7 +123,6 @@ namespace PCStore.Application.Services.OrderService
                 return TaskResult<ServiceCreateOrderResult>.Success("Order created successfully!",data:result);
             }
         }
-
         public async Task<TaskResult<ServiceGetOrderDetailsByOrderIdResult>> UserGetOrderById(ServiceGetOrderDetailsByOrderIdCommand request, CancellationToken cancellation)
         {
             var orderCommand = new GetOrderByIdQuery { OrderId = request.OrderId, UserId = request.UserId };
@@ -151,6 +151,13 @@ namespace PCStore.Application.Services.OrderService
             mapper.Map(couponUsageResult.Data, result);
             mapper.Map(orderStatusResult.Data, result);
             return TaskResult<ServiceGetOrderDetailsByOrderIdResult>.Success("Order has found successfully!",data:result);
+        }
+
+        //ORDERSTATUS
+        public async Task<TaskResult<CreateOrderStatusResult>> CreateOrderStatus(CreateOrderStatusCommand request, CancellationToken cancellation)
+        {
+            var result = await mediator.Send(request, cancellation);
+            return result;
         }
     }
 }

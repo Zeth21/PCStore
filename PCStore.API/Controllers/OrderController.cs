@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderStatusCommands;
 using PCStore.Application.Services.OrderService;
 using PCStore.Application.Services.OrderService.Commands;
 using System.Security.Claims;
@@ -27,6 +28,14 @@ namespace PCStore.API.Controllers
                 return Unauthorized();
             var request = new ServiceGetOrderDetailsByOrderIdCommand { OrderId = orderId, UserId = userId };
             var result = await service.UserGetOrderById(request, cancellation);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("status")]
+        public async Task<IActionResult> CreateOrderStatus([FromBody]CreateOrderStatusCommand request, CancellationToken cancellation = default) 
+        {
+            var result = await service.CreateOrderStatus(request, cancellation);
             return StatusCode(result.StatusCode, result);
         }
     }

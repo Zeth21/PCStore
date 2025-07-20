@@ -53,6 +53,13 @@ namespace PCStore.Persistence.Context
                 .HasIndex(c => c.CouponCode)
                 .IsUnique();
 
+            //ORDERSTATUS AYARLARI
+            modelBuilder.Entity<OrderStatus>(entity => 
+            {
+                entity.HasIndex(e => new { e.OrderId, e.StatusNameId })
+                .IsUnique();
+            });
+
         }
     }
 }
