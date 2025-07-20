@@ -12,5 +12,6 @@ namespace PCStore.Application.Services.OrderService
     public interface IOrderService
     {
         Task<TaskResult<ServiceCreateOrderResult>> CreateOrder(ServiceCreateOrderCommand request, CancellationToken cancellation);
+        Task<TaskResult<ServiceGetOrderDetailsByOrderIdResult>> UserGetOrderById(ServiceGetOrderDetailsByOrderIdCommand request, CancellationToken cancellation);
     }
 }

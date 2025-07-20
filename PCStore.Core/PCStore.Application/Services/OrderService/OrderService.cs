@@ -7,6 +7,10 @@ using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderProductListCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderStatusCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.ShoppingCartItemsCommand;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.CouponUsageQueries;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderProductListQueries;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderQueries;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderStatusQueries;
 using PCStore.Application.Features.CQRSDesignPattern.Queries.ShoppingCartItemsQueries;
 using PCStore.Application.Features.CQRSDesignPattern.Results;
 using PCStore.Application.Features.CQRSDesignPattern.Results.ShoppingCartItemResults;
@@ -117,6 +121,36 @@ namespace PCStore.Application.Services.OrderService
                 await transaction.CommitAsync(cancellation);
                 return TaskResult<ServiceCreateOrderResult>.Success("Order created successfully!",data:result);
             }
+        }
+
+        public async Task<TaskResult<ServiceGetOrderDetailsByOrderIdResult>> UserGetOrderById(ServiceGetOrderDetailsByOrderIdCommand request, CancellationToken cancellation)
+        {
+            var orderCommand = new GetOrderByIdQuery { OrderId = request.OrderId, UserId = request.UserId };
+            var orderResult = await mediator.Send(orderCommand, cancellation);
+            if (!orderResult.IsSucceeded)
+                return TaskResult<ServiceGetOrderDetailsByOrderIdResult>.NotFound("Order not found!");
+            var couponUsageCommand = new GetCouponUsageByOrderIdQuery { OrderId = request.OrderId };
+            var orderProductsCommand = new GetOrderProductListsByOrderIdQuery { OrderId = request.OrderId };
+            var orderStatusCommand = new GetOrderStatusByOrderIdQuery { OrderId = request.OrderId };
+
+            var couponUsageResult = await mediator.Send(couponUsageCommand, cancellation);
+            var orderProductsResult = await mediator.Send(orderProductsCommand, cancellation);
+            var orderStatusResult = await mediator.Send(orderStatusCommand, cancellation);
+            if(!orderProductsResult.IsSucceeded || !orderStatusResult.IsSucceeded) 
+            {
+                var errors = new List<string>();
+                if (!orderProductsResult.IsSucceeded)
+                    errors.Add(orderProductsResult.Message ?? "orderProducts error!");
+                if (!orderStatusResult.IsSucceeded)
+                    errors.Add(orderStatusResult.Message ?? "orderStatus error!");
+                return TaskResult<ServiceGetOrderDetailsByOrderIdResult>.Fail("One or more errors occured!",errors:errors);
+            }
+            var result = new ServiceGetOrderDetailsByOrderIdResult();
+            result.OrderProducts = orderProductsResult.Data!;
+            mapper.Map(orderResult.Data, result);
+            mapper.Map(couponUsageResult.Data, result);
+            mapper.Map(orderStatusResult.Data, result);
+            return TaskResult<ServiceGetOrderDetailsByOrderIdResult>.Success("Order has found successfully!",data:result);
         }
     }
 }

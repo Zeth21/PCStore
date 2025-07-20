@@ -28,5 +28,5 @@ This project is still **under active development**. Therefore, a complete instal
 
 ## Developer
 
-**Zeyitcan DAÞDEMÝR**
+**Zeyitcan DASDEMIR**
 

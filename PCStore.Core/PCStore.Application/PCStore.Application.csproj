@@ -22,16 +22,11 @@
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductTypeQueries\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\StatusNameQueries\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductRateQueries\" />
-    <Folder Include="Features\CQRSDesignPattern\Queries\OrderProductListQueries\" />
-    <Folder Include="Features\CQRSDesignPattern\Queries\OrderStatusQueries\" />
-    <Folder Include="Features\CQRSDesignPattern\Queries\OrderQueries\" />
     <Folder Include="Features\CQRSDesignPattern\Results\CategoryResults\" />
-    <Folder Include="Features\CQRSDesignPattern\Results\CouponUsageResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\ProductTypeAttributeResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\StatusNameResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\ProductRateResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\NotificationResults\" />
-    <Folder Include="Services\OrderService\Results\" />
   </ItemGroup>
 
   <ItemGroup>

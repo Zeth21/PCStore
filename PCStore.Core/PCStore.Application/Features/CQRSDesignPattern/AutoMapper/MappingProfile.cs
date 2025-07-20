@@ -23,10 +23,13 @@ using PCStore.Application.Features.CQRSDesignPattern.Results.CouponCategoryResul
 using PCStore.Application.Features.CQRSDesignPattern.Results.CouponProductsHandler;
 using PCStore.Application.Features.CQRSDesignPattern.Results.CouponProductTypeResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.CouponResults;
+using PCStore.Application.Features.CQRSDesignPattern.Results.CouponUsageResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountProductResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.FollowedProductResults;
+using PCStore.Application.Features.CQRSDesignPattern.Results.OrderProductListResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.OrderResults;
+using PCStore.Application.Features.CQRSDesignPattern.Results.OrderStatusResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.ProductAttributeResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.ProductPhotoResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.ProductResults;
@@ -37,6 +40,7 @@ using PCStore.Application.Features.Helpers.Validators.CouponValidator.Commands;
 using PCStore.Application.Features.Helpers.Validators.CouponValidator.Results;
 using PCStore.Application.Features.Helpers.Validators.DiscountValidator.Commands;
 using PCStore.Application.Features.Helpers.Validators.DiscountValidator.Results;
+using PCStore.Application.Services.OrderService.Results;
 using PCStore.Domain.Entities;
 
 namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
@@ -206,7 +210,8 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.CouponUsageUserId, o => o.MapFrom(s => s.UserId))
                 .ForMember(x => x.CouponUsageOrderId, o => o.MapFrom(s => s.OrderId))
                 .ForMember(x => x.DiscountTotal, o => o.MapFrom(s => s.DiscountTotal));
-            CreateMap<CreateOrderCommand, Order>();
+            CreateMap<CreateOrderCommand, Order>()
+                .ForMember(x => x.OrderUserId, o => o.MapFrom(s => s.UserId));
             CreateMap<Order, CreateOrderResult>();
             CreateMap<GetShopCartItemsResult, OrderProductListDTO>()
                 .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
@@ -225,6 +230,42 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
             CreateMap<DiscountUsageCalculatorResult, DiscountUsage>()
                 .ForMember(x => x.DiscountId, o => o.MapFrom(s => s.DiscountId))
                 .ForMember(x => x.DiscountTotal, o => o.MapFrom(s => s.DiscountTotal));
+            CreateMap<Order, GetOrderByIdResult>()
+                .ForMember(x => x.OrderAddress, o => o.MapFrom(s => s.Address!.Description));
+            CreateMap<OrderProductList, GetOrderProductListsByOrderIdResult>()
+                .ForMember(x => x.Id, o => o.MapFrom(s => s.ListId))
+                .ForMember(x => x.ItemCount, o => o.MapFrom(s => s.ProductQuantity))
+                .ForMember(x => x.OldPrice, o => o.MapFrom(s => s.ProductOldPrice))
+                .ForMember(x => x.OldTotalPrice, o => o.MapFrom(s => s.ProductOldTotalCost))
+                .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
+                .ForMember(x => x.TotalPrice, o => o.MapFrom(s => s.ProductTotalCost))
+                .ForMember(x => x.ProductMainPhotoPath, o => o.MapFrom(s => s.Product!.ProductMainPhotoPath))
+                .ForMember(x => x.ProductName, o => o.MapFrom(s => s.Product!.ProductName))
+                .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.ProductPrice))
+                .ForMember(x => x.ProductRateScore, o => o.MapFrom(s => s.Product!.ProductRateScore))
+                .ForMember(x => x.ProductTotalRate, o => o.MapFrom(s => s.Product!.ProductTotalRate))
+                .ForMember(x => x.BrandName, o => o.MapFrom(s => s.Product!.Brand!.BrandName))
+                .ForMember(x => x.CategoryName, o => o.MapFrom(s => s.Product!.Category!.CategoryName));
+            CreateMap<OrderStatus, GetOrderStatusByOrderIdResult>()
+                .ForMember(x => x.StatusName, o => o.MapFrom(s => s.StatusName!.StatusNameString));
+            CreateMap<CouponUsage, GetCouponUsageByOrderIdResult>()
+                .ForMember(x => x.CouponCode, o => o.MapFrom(s => s.Coupon!.CouponCode))
+                .ForMember(x => x.CouponId, o => o.MapFrom(s => s.CouponUsageCouponId));
+            CreateMap<GetCouponUsageByOrderIdResult, ServiceGetOrderDetailsByOrderIdResult>()
+                .ForMember(x => x.CouponDiscountTotal, o => o.MapFrom(s => s.DiscountTotal))
+                .ForMember(x => x.CouponCode, o => o.MapFrom(s => s.CouponCode))
+                .ForMember(x => x.CouponId, o => o.MapFrom(s => s.CouponId));
+            CreateMap<GetOrderStatusByOrderIdResult, ServiceGetOrderDetailsByOrderIdResult>()
+                .ForMember(x => x.StatusId, o => o.MapFrom(s => s.StatusId))
+                .ForMember(x => x.StatusDate, o => o.MapFrom(s => s.StatusDate))
+                .ForMember(x => x.StatusName, o => o.MapFrom(s => s.StatusName));
+            CreateMap<GetOrderByIdResult, ServiceGetOrderDetailsByOrderIdResult>()
+                .ForMember(x => x.OrderId, o => o.MapFrom(s => s.OrderId))
+                .ForMember(x => x.OrderDate, o => o.MapFrom(s => s.OrderDate))
+                .ForMember(x => x.OrderIsActive, o => o.MapFrom(s => s.OrderIsActive))
+                .ForMember(x => x.OrderAddress, o => o.MapFrom(s => s.OrderAddress))
+                .ForMember(x => x.OrderTotalCost, o => o.MapFrom(s => s.OrderTotalCost));
+
         }
     }
 }
