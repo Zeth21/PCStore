@@ -265,6 +265,20 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.OrderIsActive, o => o.MapFrom(s => s.OrderIsActive))
                 .ForMember(x => x.OrderAddress, o => o.MapFrom(s => s.OrderAddress))
                 .ForMember(x => x.OrderTotalCost, o => o.MapFrom(s => s.OrderTotalCost));
+            CreateMap<Order, UserGetOrderListResult>()
+                .ForMember(x => x.OrderId, o => o.MapFrom(s => s.OrderId))
+                .ForMember(x => x.OrderDate, o => o.MapFrom(s => s.OrderDate))
+                .ForMember(x => x.OrderDeliverDate, o => o.MapFrom(s => s.OrderDeliverDate))
+                .ForMember(x => x.OrderIsActive, o => o.MapFrom(s => s.OrderIsActive))
+                .ForMember(x => x.AddressName, o => o.MapFrom(s => s.Address!.AddressName))
+                .ForMember(x => x.StatusDate, o => o.MapFrom(s => s.OrderStatus!.OrderByDescending(os => os.StatusDate).FirstOrDefault()!.StatusDate))
+                .ForMember(x => x.StatusName, o => o.MapFrom(s => s.OrderStatus!.OrderByDescending(os => os.StatusDate).FirstOrDefault()!.StatusName))
+                .ForMember(x => x.ProductMainPhotoUrls, o => o.MapFrom(s => s.OrderProductList!
+                .Select(op => op.Product!.ProductMainPhotoPath).Take(3).ToList()));
+            CreateMap<OrderStatus, ListGetOrderStatusByOrderIdResult>()
+                .ForMember(x => x.StatusName, o => o.MapFrom(s => s.StatusName!.StatusNameString));
+
+
 
         }
     }

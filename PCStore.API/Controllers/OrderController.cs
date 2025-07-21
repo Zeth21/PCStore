@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderStatusCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderQueries;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderStatusQueries;
 using PCStore.Application.Services.OrderService;
 using PCStore.Application.Services.OrderService.Commands;
 using System.Security.Claims;
@@ -31,6 +33,26 @@ namespace PCStore.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> UserGetOrderList(CancellationToken cancellation = default) 
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                return Unauthorized();
+            var request = new UserGetOrderListQuery { UserId = userId };
+            var result = await service.UserGetOrderList(request, cancellation);
+            return StatusCode(result.StatusCode,result);
+        }
+        
+        [HttpGet("{orderId}/status")]
+        public async Task<IActionResult> GetOrderStatusList([FromRoute]int orderId, CancellationToken cancellation = default) 
+        {
+            var request = new ListGetOrderStatusByOrderIdQuery { OrderId = orderId };
+            var result = await service.GetOrderStatusList(request, cancellation);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        
         [Authorize(Roles = "Admin")]
         [HttpPost("status")]
         public async Task<IActionResult> CreateOrderStatus([FromBody]CreateOrderStatusCommand request, CancellationToken cancellation = default) 

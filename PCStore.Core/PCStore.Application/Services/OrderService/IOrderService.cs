@@ -1,5 +1,8 @@
 ﻿using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderStatusCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderQueries;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.OrderStatusQueries;
 using PCStore.Application.Features.CQRSDesignPattern.Results;
+using PCStore.Application.Features.CQRSDesignPattern.Results.OrderResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.OrderStatusResults;
 using PCStore.Application.Services.OrderService.Commands;
 using PCStore.Application.Services.OrderService.Results;
@@ -16,9 +19,11 @@ namespace PCStore.Application.Services.OrderService
         //ORDER
         Task<TaskResult<ServiceCreateOrderResult>> CreateOrder(ServiceCreateOrderCommand request, CancellationToken cancellation);
         Task<TaskResult<ServiceGetOrderDetailsByOrderIdResult>> UserGetOrderById(ServiceGetOrderDetailsByOrderIdCommand request, CancellationToken cancellation);
+        Task<TaskListResult<UserGetOrderListResult>> UserGetOrderList(UserGetOrderListQuery request, CancellationToken cancellation);
 
 
         //ORDERSTATUS
         Task<TaskResult<CreateOrderStatusResult>> CreateOrderStatus(CreateOrderStatusCommand request, CancellationToken cancellation);
+        Task<TaskListResult<ListGetOrderStatusByOrderIdResult>> GetOrderStatusList(ListGetOrderStatusByOrderIdQuery request, CancellationToken cancellation);
     }
 }
