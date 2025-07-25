@@ -34,6 +34,7 @@ namespace PCStore.API.Controllers
         }
 
         [Authorize(Roles = "Customer")]
+        [HttpGet]
         public async Task<IActionResult> UserGetOrderList(CancellationToken cancellation = default) 
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

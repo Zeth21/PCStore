@@ -23,6 +23,7 @@ using PCStore.Application.Services.DiscountService;
 using PCStore.Application.Services.EmailService;
 using PCStore.Application.Services.EmailService.ServiceDTO;
 using PCStore.Application.Services.FollowedProductsService;
+using PCStore.Application.Services.NotificationService;
 using PCStore.Application.Services.OrderService;
 using PCStore.Application.Services.ProductAttributeService;
 using PCStore.Application.Services.ProductPhotoService;
@@ -128,6 +129,7 @@ builder.Services.AddScoped<IDiscountProductService, DiscountProductService>();
 builder.Services.AddScoped<ICouponValidatorFactory, CouponValidatorFactory>();
 builder.Services.AddScoped<IDiscountUsageCalculator, DiscountUsageCalculator>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddAuthorization();
 builder.Services.Configure<SmtpSettings>(
     builder.Configuration.GetSection("SmtpSettings"));

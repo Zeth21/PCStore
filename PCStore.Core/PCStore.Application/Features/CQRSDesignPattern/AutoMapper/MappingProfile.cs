@@ -12,6 +12,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponUsageCommand
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CreateShoppingCartItemsCommand;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.DiscountCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.DiscountUsageCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.NotificationCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderProductListCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.ProductCommands;
@@ -27,6 +28,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Results.CouponUsageResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountProductResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.FollowedProductResults;
+using PCStore.Application.Features.CQRSDesignPattern.Results.NotificationResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.OrderProductListResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.OrderResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.OrderStatusResults;
@@ -277,7 +279,10 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .Select(op => op.Product!.ProductMainPhotoPath).Take(3).ToList()));
             CreateMap<OrderStatus, ListGetOrderStatusByOrderIdResult>()
                 .ForMember(x => x.StatusName, o => o.MapFrom(s => s.StatusName!.StatusNameString));
-
+            CreateMap<Notification, CreateNotificationResult>()
+                .ForMember(x => x.UserName, o => o.MapFrom(s => s.User!.UserName));
+            CreateMap<CreateNotificationCommand, Notification>();
+            CreateMap<Notification, GetAllNotificationsByUserIdResult>();
 
 
         }

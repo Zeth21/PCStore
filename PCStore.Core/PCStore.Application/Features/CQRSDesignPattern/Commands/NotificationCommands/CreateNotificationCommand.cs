@@ -1,12 +1,14 @@
-﻿using PCStore.Domain.Enum;
+﻿using MediatR;
+using PCStore.Application.Features.CQRSDesignPattern.Results;
+using PCStore.Application.Features.CQRSDesignPattern.Results.NotificationResults;
+using PCStore.Domain.Enum;
 
 namespace PCStore.Application.Features.CQRSDesignPattern.Commands.NotificationCommands
 {
-    public class CreateNotificationCommand
+    public class CreateNotificationCommand : IRequest<TaskResult<CreateNotificationResult>>
     {
         public NotifType NotificationType { get; set; }
-        public DateTime NotificationDate { get; set; } = DateTime.Now;
-        public bool NotificationStatus { get; set; } = false;
+        public required string NotificationTitle { get; set; }
         public required string NotificationContent { get; set; }
         public required string NotificationUserId { get; set; }
     }
