@@ -12,7 +12,7 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.NotificationHa
         public async Task<TaskResult<MarkNotificationAsSeenResult>> Handle(MarkNotificationAsSeenCommand request, CancellationToken cancellationToken)
         {
             var notification = await context.Notifications
-                .SingleOrDefaultAsync(x => x.NotificationId == request.NotificationId && x.NotificationUserId == request.UserId);
+                .SingleOrDefaultAsync(x => x.NotificationId == request.NotificationId && x.NotificationUserId == request.UserId && !x.NotificationStatus);
             if (notification is null)
                 return TaskResult<MarkNotificationAsSeenResult>.NotFound("Notification not found!");
             notification.NotificationStatus = true;

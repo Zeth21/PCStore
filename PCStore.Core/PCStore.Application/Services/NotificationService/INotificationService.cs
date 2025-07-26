@@ -16,5 +16,6 @@ namespace PCStore.Application.Services.NotificationService
         Task<TaskResult<MarkNotificationAsSeenResult>> MarkNotificationAsSeen(MarkNotificationAsSeenCommand request, CancellationToken cancellation);
         Task<Result> RemoveNotification(RemoveNotificationByIdCommand request, CancellationToken cancellation);
         Task<TaskListResult<GetAllNotificationsByUserIdResult>> GetAllNotifications(GetAllNotificationsByUserIdQuery request, CancellationToken cancellation);
+        Task<TaskResult<GetNotificationByIdResult>> GetNotificationById(GetNotificationByIdQuery request, CancellationToken cancellation);
     }
 }

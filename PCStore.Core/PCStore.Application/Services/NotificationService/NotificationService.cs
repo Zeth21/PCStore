@@ -25,6 +25,12 @@ namespace PCStore.Application.Services.NotificationService
             return result;
         }
 
+        public async Task<TaskResult<GetNotificationByIdResult>> GetNotificationById(GetNotificationByIdQuery request, CancellationToken cancellation)
+        {
+            var result = await mediator.Send(request, cancellation);
+            return result;
+        }
+
         public async Task<TaskResult<MarkNotificationAsSeenResult>> MarkNotificationAsSeen(MarkNotificationAsSeenCommand request, CancellationToken cancellation)
         {
             var result = await mediator.Send(request, cancellation);

@@ -2,6 +2,7 @@
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AnswerCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AnswerVoteCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AttributeDefinitionCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.BrandCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CommentCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CommentVoteCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CouponBrandCommands;
@@ -18,6 +19,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderProductListCo
 using PCStore.Application.Features.CQRSDesignPattern.Commands.ProductCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AnswerResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AttributeDefinitionResults;
+using PCStore.Application.Features.CQRSDesignPattern.Results.BrandResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.CommentResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.CouponBrandResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.CouponCategoryResults;
@@ -283,8 +285,11 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.UserName, o => o.MapFrom(s => s.User!.UserName));
             CreateMap<CreateNotificationCommand, Notification>();
             CreateMap<Notification, GetAllNotificationsByUserIdResult>();
-
-
+            CreateMap<Notification, GetNotificationByIdResult>();
+            CreateMap<Brand, CreateBrandResult>();
+            CreateMap<CreateBrandCommand, Brand>();
+            CreateMap<Brand, UpdateBrandResult>();
+            CreateMap<Brand, GetAllBrandsResult>();
         }
     }
 }

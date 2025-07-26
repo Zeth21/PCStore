@@ -56,5 +56,17 @@ namespace PCStore.API.Controllers
             var result = await service.GetAllNotifications(request, cancellation);
             return StatusCode(result.StatusCode, result);
         }
+
+        [Authorize(Roles = "Customer")]
+        [HttpGet("{notificationId}")]
+        public async Task<IActionResult> GetNotification(int notificationId,CancellationToken cancellation = default)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                return Unauthorized();
+            var request = new GetNotificationByIdQuery { UserId = userId,NotificationId =  notificationId};
+            var result = await service.GetNotificationById(request, cancellation);
+            return StatusCode(result.StatusCode, result);
+        }
     }
 }
