@@ -15,6 +15,7 @@ using PCStore.Application.Services.AnswerService;
 using PCStore.Application.Services.AnswerVoteService;
 using PCStore.Application.Services.AttributeDefinitionService;
 using PCStore.Application.Services.BrandService;
+using PCStore.Application.Services.CategoryService;
 using PCStore.Application.Services.CommentService;
 using PCStore.Application.Services.CommentVoteService;
 using PCStore.Application.Services.CouponProductService;
@@ -132,6 +133,7 @@ builder.Services.AddScoped<IDiscountUsageCalculator, DiscountUsageCalculator>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddAuthorization();
 builder.Services.Configure<SmtpSettings>(
     builder.Configuration.GetSection("SmtpSettings"));

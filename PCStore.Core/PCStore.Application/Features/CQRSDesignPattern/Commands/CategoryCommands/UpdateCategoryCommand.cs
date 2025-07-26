@@ -1,9 +1,13 @@
-﻿namespace PCStore.Application.Features.CQRSDesignPattern.Commands.CategoryCommands
+﻿using MediatR;
+using PCStore.Application.Features.CQRSDesignPattern.Results;
+using PCStore.Application.Features.CQRSDesignPattern.Results.CategoryResults;
+
+namespace PCStore.Application.Features.CQRSDesignPattern.Commands.CategoryCommands
 {
-    public class UpdateCategoryCommand
+    public class UpdateCategoryCommand : IRequest<TaskResult<UpdateCategoryResult>>
     {
         public int CategoryId { get; set; }
-        public required string CategoryPath { get; set; }
-        public required string CategoryName { get; set; }
+        public int? ParentCategoryId { get; set; }
+        public string? CategoryName { get; set; }
     }
 }

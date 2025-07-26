@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Folder Include="Features\CQRSDesignPattern\Commands\StatusNameCommands\" />
-    <Folder Include="Features\CQRSDesignPattern\Handlers\CategoryHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\StatusNameHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\ProductRateHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductAttributeQueries\" />
@@ -21,7 +20,6 @@
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductTypeQueries\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\StatusNameQueries\" />
     <Folder Include="Features\CQRSDesignPattern\Queries\ProductRateQueries\" />
-    <Folder Include="Features\CQRSDesignPattern\Results\CategoryResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\ProductTypeAttributeResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\StatusNameResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\ProductRateResults\" />
