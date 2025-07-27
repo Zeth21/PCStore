@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PCStore.Application.Features.CQRSDesignPattern.Commands.AddressCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AnswerCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AnswerVoteCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AttributeDefinitionCommands;
@@ -18,6 +19,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Commands.NotificationComman
 using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.OrderProductListCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.ProductCommands;
+using PCStore.Application.Features.CQRSDesignPattern.Results.AddressResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AnswerResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AttributeDefinitionResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.BrandResults;
@@ -296,6 +298,11 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
             CreateMap<CreateCategoryCommand, Category>();
             CreateMap<Category, CategoryListItem>();
             CreateMap<Category, UpdateCategoryResult>();
+            CreateMap<CreateAddressCommand, Address>();
+            CreateMap<Address, CreateAddressResult>();
+            CreateMap<Address, UpdateAddressResult>();
+            CreateMap<UpdateAddressCommand, Address>();
+            CreateMap<Address, GetAllAddressesResult>();
         }
     }
 }
