@@ -15,5 +15,8 @@ namespace PCStore.Application.Services.ProductService
         public Task<TaskResult<ServiceCreateProductResult>> CreateProduct(ServiceCreateProductCommand request, CancellationToken cancellationToken);
         public Task<TaskResult<UpdateProductResult>> UpdateProduct(UpdateProductCommand request, CancellationToken cancellationToken);
         public Task<TaskResult<UpdateProductTypeResult>> UpdateProductType(UpdateProductTypeCommand request, CancellationToken cancellationToken);
+        public Task<TaskListResult<GetDiscountedProductsResult>> GetAllDiscountedProducts(GetDiscountedProductsQuery request, CancellationToken cancellationToken);
+        public Task<TaskListResult<GetNewProductsResult>> GetNewProducts(GetNewProductsQuery request, CancellationToken cancellation);
+        public Task<TaskListResult<GetBestSellingProductsResult>> GetBestSellingProducts(GetBestSellingProductsQuery request, CancellationToken cancellation);
     }
 }

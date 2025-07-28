@@ -99,5 +99,13 @@ namespace PCStore.API.Controllers
             var result = await service.CouponIsValid(request, cancellation);
             return StatusCode(result.StatusCode, result);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("usage")]
+        public async Task<IActionResult> GetAllCouponUsages([FromQuery] GetAllCouponUsagesQuery request, CancellationToken cancellation = default)
+        {
+            var result = await service.GetAllCouponUsages(request, cancellation);
+            return StatusCode(result.StatusCode, result);
+        }
     }
 }

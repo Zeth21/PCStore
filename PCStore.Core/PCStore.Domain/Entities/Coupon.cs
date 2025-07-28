@@ -14,6 +14,7 @@ namespace PCStore.Domain.Entities
         public int CouponMaxUsage { get; set; }
         public int CouponMaxUsagePerUser { get; set; } = 1;
         public int CouponMinOrderAmount { get; set; } = 0;
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime CouponStartTime { get; set; } = DateTime.Now;
         public DateTime? CouponEndTime { get; set; }
         public bool CouponIsActive { get; set; } = true;

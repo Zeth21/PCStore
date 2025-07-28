@@ -10,6 +10,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Queries.CouponUsageQueries;
 using PCStore.Application.Features.CQRSDesignPattern.Results;
 using PCStore.Application.Features.CQRSDesignPattern.Results.CouponProductsHandler;
 using PCStore.Application.Features.CQRSDesignPattern.Results.CouponResults;
+using PCStore.Application.Features.CQRSDesignPattern.Results.CouponUsageResults;
 using PCStore.Application.Services.CouponService.CouponServiceCommands;
 using PCStore.Application.Services.CouponService.CouponServiceResults;
 using PCStore.Domain.Enum;
@@ -59,6 +60,12 @@ namespace PCStore.Application.Services.CouponService
         public async Task<Result> DeactiveCoupon(DeactiveCouponCommand request, CancellationToken cancellation)
         {
             var result = await mediator.Send(request,cancellation);
+            return result;
+        }
+
+        public async Task<TaskListResult<GetAllCouponUsagesResult>> GetAllCouponUsages(GetAllCouponUsagesQuery request, CancellationToken cancellation)
+        {
+            var result = await mediator.Send(request, cancellation);
             return result;
         }
 

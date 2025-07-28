@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.DiscountCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Queries.DiscountQueries;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.DiscountUsageQueries;
 using PCStore.Application.Services.DiscountService;
 
 namespace PCStore.API.Controllers
@@ -46,6 +47,14 @@ namespace PCStore.API.Controllers
         public async Task<IActionResult> GetAllDiscounts([FromQuery] GetAllDiscountsQuery request, CancellationToken cancellation = default)
         {
             var result = await service.GetAllDiscounts(request, cancellation);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("usage")]
+        public async Task<IActionResult> GetAllDiscountUsages([FromQuery]GetAllDiscountUsagesQuery request, CancellationToken cancellation = default) 
+        {
+            var result = await service.GetAllDiscountUsages(request, cancellation);
             return StatusCode(result.StatusCode, result);
         }
     }

@@ -11,6 +11,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Results.ProductResults;
 using PCStore.Application.Services.ProductService.ProductServiceCommands;
 using PCStore.Application.Services.ProductService.ProductServiceResults;
 using PCStore.Persistence.Context;
+using System.Threading;
 
 namespace PCStore.Application.Services.ProductService
 {
@@ -68,9 +69,27 @@ namespace PCStore.Application.Services.ProductService
             }
         }
 
+        public async Task<TaskListResult<GetDiscountedProductsResult>> GetAllDiscountedProducts(GetDiscountedProductsQuery request, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(request, cancellationToken);
+            return result;
+        }
+
         public async Task<TaskListResult<GetAllProductsResult>> GetAllProducts(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(request, cancellationToken);
+            return result;
+        }
+
+        public async Task<TaskListResult<GetBestSellingProductsResult>> GetBestSellingProducts(GetBestSellingProductsQuery request, CancellationToken cancellation)
+        {
+            var result = await _mediator.Send(request, cancellation);
+            return result;
+        }
+
+        public async Task<TaskListResult<GetNewProductsResult>> GetNewProducts(GetNewProductsQuery request, CancellationToken cancellation)
+        {
+            var result = await _mediator.Send(request, cancellation);
             return result;
         }
 

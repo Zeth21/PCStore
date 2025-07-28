@@ -33,6 +33,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Results.CouponResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.CouponUsageResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountProductResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountResults;
+using PCStore.Application.Features.CQRSDesignPattern.Results.DiscountUsageResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.FollowedProductResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.NotificationResults;
 using PCStore.Application.Features.CQRSDesignPattern.Results.OrderProductListResults;
@@ -303,6 +304,64 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
             CreateMap<Address, UpdateAddressResult>();
             CreateMap<UpdateAddressCommand, Address>();
             CreateMap<Address, GetAllAddressesResult>();
+            CreateMap<Discount, GetAllDiscountUsagesResult>()
+                .ForMember(dest => dest.TotalDiscount, opt => opt.MapFrom(src => src.DiscountUsages!.Sum(x => x.DiscountTotal)))
+                .ForMember(dest => dest.OrderCount, opt => opt.MapFrom(src => src.DiscountUsages!.GroupBy(x => x.OrderId).Count()));
+            CreateMap<Coupon, GetAllCouponUsagesResult>()
+                .ForMember(x => x.TotalDiscount, o => o.MapFrom(s => s.CouponUsages!.Sum(x => x.DiscountTotal)))
+                .ForMember(x => x.OrderCount, o => o.MapFrom(s => s.CouponUsages!.Count()))
+                .ForMember(x => x.UniqueUserCount, o => o.MapFrom(s => s.CouponUsages!.GroupBy(cs => cs.CouponUsageUserId).Count()));
+            CreateMap<Product, GetDiscountedProductsResult>()
+                .ForMember(x => x.ProductTypeName, o => o.MapFrom(s => s.ProductType!.Name))
+                .ForMember(x => x.ProductBrandName, o => o.MapFrom(s => s.Brand!.BrandName))
+                .ForMember(x => x.ProductCategoryName, o => o.MapFrom(s => s.Category!.CategoryName))
+                .ForMember(x => x.ProductMainPhotoPath, o => o.MapFrom(s => s.ProductMainPhotoPath))
+                .ForMember(x => x.ProductName, o => o.MapFrom(s => s.ProductName))
+                .ForMember(x => x.ProductIsAvailable, o => o.MapFrom(s => s.ProductIsAvailable))
+                .ForMember(x => x.ProductRateScore, o => o.MapFrom(s => s.ProductRateScore))
+                .ForMember(x => x.ProductStock, o => o.MapFrom(s => s.ProductStock))
+                .ForMember(x => x.ProductTotalRate, o => o.MapFrom(s => s.ProductTotalRate));
+            CreateMap<GetDiscountedProductsResult, DiscountValidatorCommand>()
+                .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
+                .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.ProductPrice));
+            CreateMap<DiscountValidatorResult, GetDiscountedProductsResult>()
+                .ForMember(x => x.OldPrice, o => o.MapFrom(s => s.OldPrice))
+                .ForMember(x => x.DiscountRate, o => o.MapFrom(s => s.DiscountRate))
+                .ForMember(x => x.IsDiscountPercentage, o => o.MapFrom(s => s.IsDiscountPercentage));
+            CreateMap<GetNewProductsResult, DiscountValidatorCommand>()
+                .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
+                .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.ProductPrice));
+            CreateMap<DiscountValidatorResult, GetNewProductsResult>()
+               .ForMember(x => x.OldPrice, o => o.MapFrom(s => s.OldPrice))
+               .ForMember(x => x.DiscountRate, o => o.MapFrom(s => s.DiscountRate))
+               .ForMember(x => x.IsDiscountPercentage, o => o.MapFrom(s => s.IsDiscountPercentage));
+            CreateMap<Product, GetNewProductsResult>()
+                .ForMember(x => x.ProductTypeName, o => o.MapFrom(s => s.ProductType!.Name))
+                .ForMember(x => x.ProductBrandName, o => o.MapFrom(s => s.Brand!.BrandName))
+                .ForMember(x => x.ProductCategoryName, o => o.MapFrom(s => s.Category!.CategoryName))
+                .ForMember(x => x.ProductMainPhotoPath, o => o.MapFrom(s => s.ProductMainPhotoPath))
+                .ForMember(x => x.ProductName, o => o.MapFrom(s => s.ProductName))
+                .ForMember(x => x.ProductIsAvailable, o => o.MapFrom(s => s.ProductIsAvailable))
+                .ForMember(x => x.ProductRateScore, o => o.MapFrom(s => s.ProductRateScore))
+                .ForMember(x => x.ProductStock, o => o.MapFrom(s => s.ProductStock))
+                .ForMember(x => x.ProductTotalRate, o => o.MapFrom(s => s.ProductTotalRate));
+            CreateMap<GetBestSellingProductsResult, DiscountValidatorCommand>()
+                .ForMember(x => x.ProductId, o => o.MapFrom(s => s.ProductId))
+                .ForMember(x => x.ProductPrice, o => o.MapFrom(s => s.ProductPrice));
+            CreateMap<DiscountValidatorResult, GetBestSellingProductsResult>()
+                .ForMember(x => x.OldPrice, o => o.MapFrom(s => s.OldPrice))
+                .ForMember(x => x.DiscountRate, o => o.MapFrom(s => s.DiscountRate))
+                .ForMember(x => x.IsDiscountPercentage, o => o.MapFrom(s => s.IsDiscountPercentage));
+            CreateMap<Product, GetBestSellingProductsResult>()
+                .ForMember(x => x.ProductTypeName, o => o.MapFrom(s => s.ProductType!.Name))
+                .ForMember(x => x.ProductBrandName, o => o.MapFrom(s => s.Brand!.BrandName))
+                .ForMember(x => x.ProductCategoryName, o => o.MapFrom(s => s.Category!.CategoryName))
+                .ForMember(x => x.ProductMainPhotoPath, o => o.MapFrom(s => s.ProductMainPhotoPath))
+                .ForMember(x => x.ProductName, o => o.MapFrom(s => s.ProductName))
+                .ForMember(x => x.ProductIsAvailable, o => o.MapFrom(s => s.ProductIsAvailable))
+                .ForMember(x => x.ProductRateScore, o => o.MapFrom(s => s.ProductRateScore))
+                .ForMember(x => x.ProductStock, o => o.MapFrom(s => s.ProductStock))
+                .ForMember(x => x.ProductTotalRate, o => o.MapFrom(s => s.ProductTotalRate));
         }
     }
 }

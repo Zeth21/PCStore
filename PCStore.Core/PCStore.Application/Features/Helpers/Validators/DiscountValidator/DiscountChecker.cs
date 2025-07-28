@@ -1,17 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using PCStore.Application.Features.CQRSDesignPattern.Results.ProductResults;
 using PCStore.Application.Features.Helpers.Validators.DiscountValidator.Commands;
 using PCStore.Application.Features.Helpers.Validators.DiscountValidator.Results;
 using PCStore.Domain.Entities;
 using PCStore.Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace PCStore.Application.Features.Helpers.Validators.DiscountValidator
 {

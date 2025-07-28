@@ -4,6 +4,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Commands.ProductCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Queries.ProductQueries;
 using PCStore.Application.Services.ProductService;
 using PCStore.Application.Services.ProductService.ProductServiceCommands;
+using System.Threading;
 
 namespace PCStore.API.Controllers
 {
@@ -59,6 +60,25 @@ namespace PCStore.API.Controllers
         public async Task<IActionResult> UpdateProductType([FromBody]UpdateProductTypeCommand request, CancellationToken cancellationToken = default) 
         {
             var result = await _productService.UpdateProductType(request, cancellationToken);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpGet("discount")]
+        public async Task<IActionResult> GetAllDiscountedProducts([FromQuery]GetDiscountedProductsQuery request, CancellationToken cancellation = default) 
+        {
+            var result = await _productService.GetAllDiscountedProducts(request, cancellation);
+            return StatusCode(result.StatusCode, result);
+        }
+        [HttpGet("new")]
+        public async Task<IActionResult> GetNewProducts([FromQuery] GetNewProductsQuery request, CancellationToken cancellation = default)
+        {
+            var result = await _productService.GetNewProducts(request, cancellation);
+            return StatusCode(result.StatusCode, result);
+        }
+        [HttpGet("bestseller")]
+        public async Task<IActionResult> GetBestSellingProducts([FromQuery] GetBestSellingProductsQuery request, CancellationToken cancellation = default)
+        {
+            var result = await _productService.GetBestSellingProducts(request, cancellation);
             return StatusCode(result.StatusCode, result);
         }
     }
