@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCStore.UI", "PCStore.UI\PCStore.UI.csproj", "{BAB20A7C-01FF-473A-9A1A-93CD8424E462}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{192B4A04-9C19-48B1-9752-37BB29650746}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{192B4A04-9C19-48B1-9752-37BB29650746}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{192B4A04-9C19-48B1-9752-37BB29650746}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAB20A7C-01FF-473A-9A1A-93CD8424E462}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB20A7C-01FF-473A-9A1A-93CD8424E462}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAB20A7C-01FF-473A-9A1A-93CD8424E462}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAB20A7C-01FF-473A-9A1A-93CD8424E462}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{4F4B0429-D0E2-4607-A6B3-B11E3548448C} = {18A997B2-E5A9-4B2F-9D0F-60CEA87E45D4}
 		{EE08AF0D-0F3E-4721-8A0B-CA3A99327A49} = {13959638-E326-47C1-8339-C5402CE1CE60}
 		{192B4A04-9C19-48B1-9752-37BB29650746} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{BAB20A7C-01FF-473A-9A1A-93CD8424E462} = {13959638-E326-47C1-8339-C5402CE1CE60}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {703C1B41-03F1-4451-9430-4629A4E87847}

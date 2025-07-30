@@ -1,0 +1,66 @@
+﻿@page "/products"
+@inject ProductService ProductService
+
+@using PCStore.UI.Models.Queries.ProductQueries
+@using PCStore.UI.Models.Results.ProductResults
+@using PCStore.UI.Services
+@using PCStore.UI.Components
+<h3>Tüm Ürünler</h3>
+
+@if (isLoading)
+{
+    <p>Yükleniyor...</p>
+}
+else if (allProducts == null || allProducts.Count == 0)
+{
+    <p>Hiç ürün bulunamadı.</p>
+}
+else
+{
+    <div class="products-grid">
+        @foreach (var product in allProducts)
+        {
+            <ProductCardComponent Product="product" />
+        }
+    </div>
+}
+
+@code {
+    private List<ProductCardModel> allProducts = new();
+    private bool isLoading = true;
+
+    private GetAllProductsQuery query = new()
+        {
+            PageNumber = 1,
+            PageSize = 50,
+            Name = null,
+            CategoryName = null,
+            MinPrice = null,
+            MaxPrice = null
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        try
+        {
+            allProducts = await ProductService.GetAllProductsAsync(query);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+<style>
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+    }
+</style>

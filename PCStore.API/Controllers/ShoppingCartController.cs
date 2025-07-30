@@ -14,11 +14,17 @@ namespace PCStore.API.Controllers
     public class ShoppingCartController(IShoppingCartService cartService) : ControllerBase
     {
         private readonly IShoppingCartService _cartService = cartService;
+
+        [Authorize(Roles = "Customer")]
         [HttpPost]
         public async Task<IActionResult> CreateShopCartItem([FromBody] CreateShopCartItemCommand request, CancellationToken cancellation = default) 
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized();
+            request.UserId = userId;
             var result = await _cartService.CreateShopCartItem(request,cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Message);
         }
 
         [Authorize(Roles ="Customer")]
@@ -30,7 +36,7 @@ namespace PCStore.API.Controllers
                 return Unauthorized();
             var request = new RemoveShopCartItemCommand { Id = id, UserId = userId };
             var result = await _cartService.RemoveShopCartItem(request, cancellation);
-            return StatusCode(result.StatusCode,result);
+            return StatusCode(result.StatusCode,result.Message);
         }
 
         [Authorize(Roles = "Customer,Admin")]
@@ -42,7 +48,7 @@ namespace PCStore.API.Controllers
                 return Unauthorized();
             var request = new GetShopCartItemsQuery { UserId = userId, CouponId = couponId};
             var result = await _cartService.GetShopCartItems(request,cancellation);
-            return StatusCode(result.StatusCode,result);
+            return StatusCode(result.StatusCode,result.Data);
         }
      }
 }

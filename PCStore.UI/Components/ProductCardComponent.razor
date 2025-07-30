@@ -1,0 +1,82 @@
+﻿@using PCStore.UI.Models.Commands.ShopCartCommands
+@using PCStore.UI.Models.Results.ProductResults
+@using PCStore.UI.Services
+@using System.Globalization
+
+<div class="product-card">
+    <div class="product-image">
+        <img src="https://localhost:44393/product-photos/@Product.ProductMainPhotoPath" alt="@Product.ProductName" />
+        @if (Product.IsDiscountPercentage == true && Product.DiscountRate.HasValue)
+        {
+            <span class="badge-discount">-%@Product.DiscountRate.Value</span>
+        }
+        @if (!Product.ProductIsAvailable || Product.ProductStock == 0)
+        {
+            <span class="badge-outofstock">Stokta Yok</span>
+        }
+    </div>
+
+    <div class="product-info">
+        <h4 class="product-name">
+            <a href="@($"/product/{Product.ProductId}")">@Product.ProductName</a>
+        </h4>
+
+        <div class="product-prices">
+            <span class="price-discounted">@Product.ProductPrice.ToString("C", CultureInfo.CurrentCulture)</span>
+            @if (Product.OldPrice.HasValue)
+            {
+                <span class="price-original">@Product.OldPrice.Value.ToString("C", CultureInfo.CurrentCulture)</span>
+            }
+        </div>
+
+        <div class="product-meta">
+            <span class="brand">@Product.ProductBrandName</span>
+            <span class="category">@Product.ProductCategoryName</span>
+        </div>
+
+        <div class="rating">
+            <span class="stars">⭐ @Product.ProductRateScore.ToString("0.0")</span>
+            <span class="total-rates">(@Product.ProductTotalRate)</span>
+        </div>
+
+        <div class="stock-type">
+            <small>Stok: @Product.ProductStock</small> |
+            <small>Tip: @Product.ProductTypeName</small>
+        </div>
+
+        <button class="add-to-cart-button" @onclick="AddToCart">Sepete Ekle</button>
+
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <div class="alert-message">@Message</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public ProductCardModel Product { get; set; } = default!;
+
+    [Inject] private CartService CartService { get; set; } = default!;
+
+    private string Message = string.Empty;
+
+    private async Task AddToCart()
+    {
+        var command = new CreateShopCartItemCommand
+            {
+                ProductId = Product.ProductId
+            };
+
+        var resultMessage = await CartService.CreateShopCartItem(command);
+
+        Message = resultMessage;
+
+        StateHasChanged();
+
+        await Task.Delay(3000);
+
+        Message = string.Empty;
+
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,63 @@
+﻿@page "/cart"
+@using PCStore.UI.Components
+@using PCStore.UI.Models.Results.CartResults
+@inject CartService cartService
+
+<div class="cart-container">
+    <h3>My Cart</h3>
+
+    @if (isLoading)
+    {
+        <p>Loading...</p>
+    }
+    else if (cartItems is not null)
+    {
+        <div class="cart-summary">
+            <p><strong>Total Cost:</strong> @cartItems.TotalCost ₺</p>
+
+            @if (cartItems.TotalCouponDiscount.HasValue)
+            {
+                <p><strong>Coupon Discount:</strong> -@cartItems.TotalCouponDiscount ₺</p>
+            }
+
+            @if (cartItems.TotalDiscount.HasValue && cartItems.TotalDiscount.Value > 0)
+            {
+                <p><strong>Product Total Discount:</strong> -@cartItems.TotalDiscount ₺</p>
+            }
+        </div>
+
+        <div class="cart-items-grid">
+            @foreach (var item in cartItems.CartItems)
+            {
+                <ShopCartProduct Item="item" OnRemoved="HandleItemRemoved" />
+            }
+        </div>
+    }
+    else
+    {
+        <p>Sepetiniz boş.</p>
+    }
+</div>
+
+@code {
+    private BulkGetShopCartItemsResult? cartItems;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCartItemsAsync();
+    }
+
+    private async Task LoadCartItemsAsync()
+    {
+        isLoading = true;
+        cartItems = await cartService.GetShopCartItemsAsync();
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleItemRemoved(int removedItemId)
+    {
+        await LoadCartItemsAsync();
+    }
+}

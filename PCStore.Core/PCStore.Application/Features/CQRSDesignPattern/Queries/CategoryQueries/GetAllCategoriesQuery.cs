@@ -11,6 +11,6 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Queries.CategoryQueries
 {
     public class GetAllCategoriesQuery : IRequest<TaskResult<GetAllCategoriesResult>>
     {
-        public int? ParentCategoryId { get; set; } = null!;
+        public int? ParentCategoryId { get; set; }
     }
 }

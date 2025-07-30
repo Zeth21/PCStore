@@ -1,0 +1,57 @@
+﻿@using PCStore.UI.Services
+@using PCStore.UI.Layout
+@inject NavigationManager Navigation
+@inject AuthService AuthService
+
+<header class="header">
+    <div class="left">
+        <strong>PCStore</strong>
+    </div>
+
+    <div class="right">
+        <a href="/">Home</a>
+
+        @if (isLoggedIn)
+        {
+            <button @onclick="Cart">MyCart</button>
+            <button @onclick="Logout">Logout</button>
+        }
+        else
+        {
+            <button @onclick="Login">Login</button>
+        }
+    </div>
+</header>
+
+@code {
+    private bool isLoggedIn;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoggedIn = await AuthService.IsLoggedInAsync();
+        AuthService.OnChange += StateChanged;
+    }
+
+    private void StateChanged()
+    {
+        InvokeAsync(async () =>
+        {
+            isLoggedIn = await AuthService.IsLoggedInAsync();
+            StateHasChanged();
+        });
+    }
+
+    private void Login() => Navigation.NavigateTo("/login");
+    private void Cart() => Navigation.NavigateTo("/cart");
+
+    private async Task Logout()
+    {
+        await AuthService.RemoveToken();
+        Navigation.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= StateChanged;
+    }
+}

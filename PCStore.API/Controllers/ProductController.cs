@@ -21,7 +21,7 @@ namespace PCStore.API.Controllers
         public async Task<IActionResult> GetAllProducts([FromQuery] GetAllProductsQuery request, CancellationToken cancellationToken = default)
         {
             var result = await _productService.GetAllProducts(request, cancellationToken);
-            return StatusCode(result.StatusCode,result);
+            return StatusCode(result.StatusCode,result.Data);
         }
 
         [HttpGet("{id}")]
@@ -67,19 +67,19 @@ namespace PCStore.API.Controllers
         public async Task<IActionResult> GetAllDiscountedProducts([FromQuery]GetDiscountedProductsQuery request, CancellationToken cancellation = default) 
         {
             var result = await _productService.GetAllDiscountedProducts(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
         [HttpGet("new")]
         public async Task<IActionResult> GetNewProducts([FromQuery] GetNewProductsQuery request, CancellationToken cancellation = default)
         {
             var result = await _productService.GetNewProducts(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
         [HttpGet("bestseller")]
         public async Task<IActionResult> GetBestSellingProducts([FromQuery] GetBestSellingProductsQuery request, CancellationToken cancellation = default)
         {
             var result = await _productService.GetBestSellingProducts(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
     }
 }

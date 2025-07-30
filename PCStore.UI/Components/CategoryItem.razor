@@ -1,0 +1,115 @@
+﻿@using PCStore.UI.Models.Results.CategoryResults
+@inject HttpClient Http
+
+<li>
+    <button @onclick="ToggleSubCategories" class="toggle-button" aria-label="Toggle Subcategories">
+        @if (IsExpanded)
+        {
+            <span>▼</span>
+        }
+        else
+        {
+            <span>▶</span>
+        }
+    </button>
+
+    <span @onclick="() => OnCategorySelected.InvokeAsync(Category)" class="category-name">
+        @Category.CategoryName
+    </span>
+
+    @if (IsExpanded && SubCategories?.Any() == true)
+    {
+        <ul class="subcategory-list">
+            @foreach (var subCat in SubCategories)
+            {
+                <CategoryItem Category="subCat" OnCategorySelected="OnCategorySelected" />
+            }
+        </ul>
+    }
+</li>
+
+
+@code {
+    [Parameter] public GetCategoryDTO Category { get; set; } = null!;
+    [Parameter] public EventCallback<GetCategoryDTO> OnCategorySelected { get; set; }
+
+    private bool IsExpanded = false;
+    private List<GetCategoryDTO>? SubCategories;
+
+    private async Task ToggleSubCategories()
+    {
+        if (IsExpanded)
+        {
+            // Kapat
+            IsExpanded = false;
+        }
+        else
+        {
+            // Aç
+            if (SubCategories == null)
+            {
+                // Eğer alt kategoriler yüklenmemişse API'den çek
+                try
+                {
+                    var response = await Http.GetAsync($"api/Category?ParentCategoryId={Category.CategoryId}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = await response.Content.ReadFromJsonAsync<GetAllCategoriesResult>();
+                        SubCategories = result?.Categories;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Alt kategori yükleme hatası: {ex.Message}");
+                    SubCategories = new List<GetCategoryDTO>();
+                }
+            }
+
+            IsExpanded = true;
+        }
+    }
+}
+
+<style>
+    /* Ana kategori li: toggle ve isim yan yana */
+    li {
+        list-style: none;
+        margin: 4px 0;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Toggle buton */
+    .toggle-button {
+        background: none;
+        border: none;
+        font-size: 0.8rem;
+        cursor: pointer;
+        padding: 0;
+        margin-right: 8px;
+        width: 20px;
+        height: 20px;
+        line-height: 1;
+        color: #0078d7;
+        user-select: none;
+    }
+
+    /* Kategori ismi */
+    .category-name {
+        font-size: 0.9rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* Alt kategoriler için ul */
+    .subcategory-list {
+        margin-left: 24px; /* biraz sağa kaydır */
+        padding-left: 0;
+    }
+
+        /* Alt kategorilerdeki li'ler: blok olarak alt alta sıralansın */
+        .subcategory-list > li {
+            display: block !important;
+            margin: 2px 0;
+        }
+</style>

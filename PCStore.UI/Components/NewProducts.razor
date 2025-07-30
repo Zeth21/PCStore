@@ -1,0 +1,68 @@
+﻿@using PCStore.UI.Models.Results.ProductResults
+@using PCStore.UI.Components
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<div class="product-slider-container">
+    <div class="product-slider-header">
+        <h3>Yeni Ürünler</h3>
+    </div>
+
+    @if (isLoading)
+    {
+        <p>Yükleniyor...</p>
+    }
+    else if (newProducts == null || newProducts.Count == 0)
+    {
+        <p>Yeni ürün bulunamadı.</p>
+    }
+    else
+    {
+        <div class="product-slider-wrapper">
+            <button class="slider-button left" @onclick="() => ScrollSlider(-1)">&#8249;</button>
+
+            <div class="product-slider" @ref="sliderRef">
+                @foreach (var product in newProducts)
+                {
+                    <ProductCardComponent Product="product" />
+                }
+            </div>
+
+            <button class="slider-button right" @onclick="() => ScrollSlider(1)">&#8250;</button>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ProductCardModel> newProducts = new();
+    private bool isLoading = true;
+
+    private int pageNumber = 1;
+    private int pageSize = 10;
+
+    private ElementReference sliderRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        try
+        {
+            var url = $"api/Product/new?pageNumber={pageNumber}&pageSize={pageSize}";
+            newProducts = await Http.GetFromJsonAsync<List<ProductCardModel>>(url);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            newProducts = new();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ScrollSlider(int direction)
+    {
+        await JS.InvokeVoidAsync("sliderScroll.scroll", sliderRef, direction);
+    }
+}

@@ -1,0 +1,123 @@
+﻿@page "/product/{ProductId:int}"
+@using PCStore.UI.Models.Results.ProductResults
+@using PCStore.UI.Services
+@inject ProductService ProductService
+
+<h3>Ürün Detayı</h3>
+
+@if (IsLoading)
+{
+    <p>Yükleniyor...</p>
+}
+else if (ProductDetails is null)
+{
+    <p>Ürün bulunamadı.</p>
+}
+else
+{
+    <div class="product-details-container">
+
+        <section class="section product-header">
+            <img class="product-main-photo" src="https://localhost:44393/product-photos/@ProductDetails.Informations?.ProductMainPhotoPath" alt="@ProductDetails.Informations?.ProductName" />
+            <div class="product-info">
+                <h4 class="product-name">@ProductDetails.Informations?.ProductName</h4>
+                <div class="product-brand">@ProductDetails.BrandName</div>
+                <div class="product-price">
+                    @ProductDetails.Informations?.ProductPrice?.ToString("C")
+                    @if (ProductDetails.Informations?.OldPrice != null)
+                    {
+                        <span class="product-old-price">@ProductDetails.Informations.OldPrice?.ToString("C")</span>
+                    }
+                    @if (ProductDetails.Informations?.IsDiscountPercentage == true)
+                    {
+                        <span class="discount-rate">İndirim: %@ProductDetails.Informations.DiscountRate</span>
+                    }
+                </div>
+                <div class="product-rating">
+                    Değerlendirme: @ProductDetails.Informations?.ProductRateScore ?? 0 / 5 (@ProductDetails.Informations?.ProductTotalRate ?? 0 oy)
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3>Özellikler</h3>
+            <ul class="attributes-list">
+                @foreach (var attr in ProductDetails.Attributes ?? Enumerable.Empty<GetProductAttributesResult>())
+                {
+                    <li class="attribute-item">
+                        <span class="attribute-name">@attr.Name:</span> @attr.Value @attr.Unit
+                    </li>
+                }
+            </ul>
+        </section>
+
+        <section class="section">
+            <h3>Fotoğraflar</h3>
+            <div class="photos-gallery">
+                @foreach (var photo in ProductDetails.Photos ?? Enumerable.Empty<GetPhotosByProductIdResult>())
+                {
+                    <img src="https://localhost:44393/product-photos/@photo.PhotoPath" alt="@photo.PhotoName" />
+                }
+            </div>
+        </section>
+
+        <section class="section questions-section">
+            <h3>Sorular</h3>
+            <ul>
+                @foreach (var question in ProductDetails.Questions ?? Enumerable.Empty<GetQuestionsByProductIdResult>())
+                {
+                    <li class="question-item">
+                        <div>
+                            <b class="question-user">@question.UserName</b> - <span class="question-date">@question.QuestionDate.ToShortDateString()</span>
+                        </div>
+                        <div class="question-text">@question.QuestionText</div>
+                        <div>Oylar: @question.QuestionUpVoteCount</div>
+
+                        @if (question.Answers?.Any() == true)
+                        {
+                            <ul>
+                                @foreach (var answer in question.Answers)
+                                {
+                                    <li class="answer-item">
+                                        <b>@answer.UserName</b> - @answer.Date.ToShortDateString() <br />
+                                        @answer.Text
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ul>
+        </section>
+
+        <section class="section comments-section">
+            <h3>Yorumlar</h3>
+            <ul>
+                @foreach (var comment in ProductDetails.Comments ?? Enumerable.Empty<GetCommentsByProductIdResult>())
+                {
+                    <li class="comment-item">
+                        <div>
+                            <b class="comment-user">@comment.UserName</b> - <span class="comment-date">@comment.CommentDate.ToShortDateString()</span>
+                        </div>
+                        <div class="comment-text">@comment.CommentText</div>
+                        <div>Cevap sayısı: @comment.CommentAnswerCount, Oylar: +@comment.CommentUpVoteCount / -@comment.CommentDownVoteCount</div>
+                    </li>
+                }
+            </ul>
+        </section>
+
+    </div>
+}
+
+@code {
+    [Parameter] public int ProductId { get; set; }
+
+    private GetFacadeProductDetailsResult? ProductDetails;
+    private bool IsLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductDetails = await ProductService.GetProductDetailsAsync(ProductId);
+        IsLoading = false;
+    }
+}

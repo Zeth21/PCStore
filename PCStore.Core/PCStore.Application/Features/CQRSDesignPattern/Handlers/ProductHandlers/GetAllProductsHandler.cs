@@ -19,6 +19,7 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.ProductHandler
 
         public async Task<TaskListResult<GetAllProductsResult>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
+            var photoPath = await _projectDbContext.ProductPhotos.FirstAsync();
             var query = _projectDbContext.Products.Include(x => x.Brand).Include(x => x.Category).Include(x => x.ProductType).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(request.Name))

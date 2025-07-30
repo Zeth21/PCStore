@@ -1,0 +1,72 @@
+﻿@inject HttpClient Http
+@using PCStore.UI.Models.Queries.CategoryQueries
+@using PCStore.UI.Models.Results.CategoryResults
+
+<div class="sidebar">
+    <h4>Kategoriler</h4>
+
+    @if (IsLoading)
+    {
+        <p>Yükleniyor...</p>
+    }
+    else if (Categories is not null && Categories.Any())
+    {
+        <ul>
+            @foreach (var category in Categories)
+            {
+                <CategoryItem Category="category" OnCategorySelected="LoadSubCategories" />
+            }
+        </ul>
+
+    }
+    else
+    {
+        <p>Kategori bulunamadı.</p>
+    }
+</div>
+
+@code {
+    private List<GetCategoryDTO>? Categories;
+    private bool IsLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories(null);
+        IsLoading = false;
+    }
+
+    private async Task LoadCategories(int? parentId)
+    {
+        var url = "api/Category";
+        if (parentId.HasValue)
+            url += $"?ParentCategoryId={parentId.Value}";
+
+        var response = await Http.GetAsync(url);
+        var result = await response.Content.ReadFromJsonAsync<GetAllCategoriesResult>();
+
+        if (parentId == null)
+            Categories = result?.Categories;
+        else
+            // alt kategorileri ilgili kategoriye set edecek şekilde yapacağız (CategoryItem içinde)
+            ; // burayı boş bırakacağız, çünkü alt kategorileri CategoryItem bileşeninde tutacağız
+    }
+
+    // Bu method CategoryItem bileşeninden çağrılır, orada alt kategoriler getirilir ve gösterilir.
+    private async Task LoadSubCategories(GetCategoryDTO parentCategory)
+    {
+        if (parentCategory.SubCategories != null && parentCategory.SubCategories.Any())
+        {
+            // zaten yüklüyse gizle (toggle)
+            parentCategory.SubCategories = null;
+        }
+        else
+        {
+            var url = $"api/Category?ParentCategoryId={parentCategory.CategoryId}";
+            var response = await Http.GetAsync(url);
+            var result = await response.Content.ReadFromJsonAsync<GetAllCategoriesResult>();
+            parentCategory.SubCategories = result?.Categories;
+        }
+
+        StateHasChanged();
+    }
+}

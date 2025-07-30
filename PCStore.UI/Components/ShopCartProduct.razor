@@ -1,0 +1,69 @@
+﻿@inject CartService cartService
+@inject IJSRuntime jsRuntime
+
+@using PCStore.UI.Models.Results.CartResults
+@code {
+    [Parameter]
+    public required GetShopCartItemsResult Item { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnRemoved { get; set; }
+
+    private async Task OnRemoveClick()
+    {
+        var message = await cartService.RemoveShopCartItemAsync(Item.Id);
+        if (!string.IsNullOrEmpty(message))
+        {
+            await jsRuntime.InvokeVoidAsync("alert", message);
+            await OnRemoved.InvokeAsync(Item.Id); // Parent component'e bildir
+        }
+        else
+        {
+            await jsRuntime.InvokeVoidAsync("alert", "Ürün silinemedi.");
+        }
+    }
+}
+
+@if (Item is not null)
+{
+    <div class="cart-item">
+        <!-- Çarpı butonu -->
+        <button class="remove-btn" @onclick="OnRemoveClick">×</button>
+
+        <!-- Sol: Görsel -->
+        <img src="https://localhost:44393/product-photos/@Item.ProductMainPhotoPath" alt="@Item.ProductName" />
+
+        <!-- Orta: Ürün detayları -->
+        <div class="cart-item-details">
+            <p><strong>@Item.ProductName</strong></p>
+            <p>@Item.BrandName - @Item.CategoryName</p>
+            <p>Ürün Puanı: ⭐ @Item.ProductRateScore (@Item.ProductTotalRate kişi)</p>
+        </div>
+
+        <!-- Sağ: Fiyat bilgileri -->
+        <div class="cart-item-price">
+            <p><strong>@Item.ProductPrice ₺</strong> x @Item.ItemCount</p>
+            <p><strong>Toplam: @Item.TotalPrice ₺</strong></p>
+
+            @if (Item.OldTotalPrice.HasValue)
+            {
+                <p>İndirimliydi: <s>@Item.OldTotalPrice ₺</s></p>
+            }
+
+            @if (Item.DiscountRate.HasValue)
+            {
+                <p class="discount-info">
+                    İndirim:
+                    @if (Item.IsDiscountPercentage == true)
+                    {
+                        @($"{Item.DiscountRate}%")
+                    }
+                    else
+                    {
+                        @($"{Item.DiscountRate}₺")
+                    }
+                </p>
+            }
+        </div>
+    </div>
+}

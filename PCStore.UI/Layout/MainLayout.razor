@@ -1,0 +1,14 @@
+﻿@using PCStore.UI.Components
+@inherits LayoutComponentBase
+
+<div class="layout-container">
+    <HeaderComponent />
+
+    <div class="main-content">
+        <Sidebar />
+
+        <div class="page-content">
+            @Body
+        </div>
+    </div>
+</div>

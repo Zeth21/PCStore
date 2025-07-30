@@ -1,0 +1,55 @@
+﻿@using PCStore.UI.Models.Commands.UserCommands
+@using PCStore.UI.Services
+@page "/login"
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<h3>Giriş Yap</h3>
+
+<div class="login-form">
+    <label>Email:</label>
+    <input @bind="LoginModel.Email" type="email" />
+
+    <label>Şifre:</label>
+    <input @bind="LoginModel.Password" type="password" />
+
+    <button @onclick="HandleLogin" disabled="@isLoading">Giriş Yap</button>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <p style="color:red;">@ErrorMessage</p>
+    }
+</div>
+
+@code {
+    private LoginCommand LoginModel = new();
+    private bool isLoading = false;
+    private string ErrorMessage;
+
+    private async Task HandleLogin()
+    {
+        isLoading = true;
+        ErrorMessage = null;
+
+        try
+        {
+            var result = await AuthService.LoginAsync(LoginModel);
+            if (result)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                ErrorMessage = "Geçersiz email veya şifre.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Hata: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

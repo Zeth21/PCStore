@@ -27,7 +27,7 @@ namespace PCStore.API.Controllers
         {
             var request = new GetAllCategoriesQuery { ParentCategoryId = parentCategoryId };
             var result = await service.GetAllCategories(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
 
         [Authorize(Roles = "Admin")]
