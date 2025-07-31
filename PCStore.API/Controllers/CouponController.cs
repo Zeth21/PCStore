@@ -89,15 +89,15 @@ namespace PCStore.API.Controllers
         }
 
         [Authorize(Roles = "Customer")]
-        [HttpGet("{couponId}/isValid")]
-        public async Task<IActionResult> CouponIsValid(int couponId, CancellationToken cancellation = default) 
+        [HttpGet("isValid")]
+        public async Task<IActionResult> CouponIsValid([FromQuery]string couponCode, CancellationToken cancellation = default) 
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId is null)
-                return Forbid();
-            var request = new IsCouponValidQuery { CouponId = couponId, UserId = userId };
+                return Unauthorized();
+            var request = new IsCouponValidQuery { CouponCode = couponCode, UserId = userId };
             var result = await service.CouponIsValid(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
 
         [Authorize(Roles = "Admin")]

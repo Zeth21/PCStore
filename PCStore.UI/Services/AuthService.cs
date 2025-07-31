@@ -1,5 +1,6 @@
 ﻿using Microsoft.JSInterop;
 using PCStore.UI.Models.Commands.UserCommands;
+using PCStore.UI.Models.Results.UserResults;
 using System.Net.Http.Json;
 using static System.Net.WebRequestMethods;
 
@@ -49,6 +50,68 @@ namespace PCStore.UI.Services
 
             await SetToken(result.Token);
             return true;
+        }
+        public async Task<bool> RegisterAsync(RegisterCommand command)
+        {
+            try
+            {
+                var response = await _http.PostAsJsonAsync("api/User/Account/Create", command);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Kayıt isteği başarısız. StatusCode: {response.StatusCode}");
+                    return false;
+                }
+
+                var result = await response.Content.ReadFromJsonAsync<RegisterResult>();
+
+                if (result == null)
+                {
+                    Console.WriteLine("Kayıt sonucu null döndü.");
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(result.Token) || string.IsNullOrWhiteSpace(result.UserId))
+                {
+                    Console.WriteLine("Kayıt sonucu geçersiz token veya kullanıcı ID içeriyor.");
+                    return false;
+                }
+
+                await SetToken(result.Token);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"RegisterAsync sırasında hata oluştu: {ex.Message}");
+                return false;
+            }
+        }
+        public async Task<bool> SendPasswordResetAsync(string email)
+        {
+            try
+            {
+                var response = await _http.PostAsJsonAsync("api/User/Email/ResetPassword", new { Email = email });
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> ResetPassword(string userId, string token, string newPassword)
+        {
+            try
+            {
+                var url = $"api/User/Account/ResetPassword?userId={userId}&token={token}&password={Uri.EscapeDataString(newPassword)}";
+                var response = await _http.GetAsync(url);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public class LoginResult

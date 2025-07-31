@@ -362,6 +362,8 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.ProductRateScore, o => o.MapFrom(s => s.ProductRateScore))
                 .ForMember(x => x.ProductStock, o => o.MapFrom(s => s.ProductStock))
                 .ForMember(x => x.ProductTotalRate, o => o.MapFrom(s => s.ProductTotalRate));
+            CreateMap<Coupon, IsCouponValidResult>();
+
         }
     }
 }

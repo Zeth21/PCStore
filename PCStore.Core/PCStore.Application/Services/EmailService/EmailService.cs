@@ -52,8 +52,8 @@ namespace PCStore.Application.Services.EmailService
         public async Task<Result> SendResetPasswordTokenEmail(ResetPasswordToken request)
         {
             var encodedToken = HttpUtility.UrlEncode(request.Token);
-            request.Url = request.Url.Replace("%7BuserId%7D", request.UserId)
-                .Replace("%7Btoken%7D", encodedToken);
+            request.Url = request.Url.Replace("{userId}", request.UserId)
+                .Replace("{token}", encodedToken);
             string subject = "Reset Password";
             string body = $"Click here to reset your password!   <a href='{request.Url}'>" + request.Url + "</a>";
             using var client = new SmtpClient(_smtpSettings.Server, _smtpSettings.Port)

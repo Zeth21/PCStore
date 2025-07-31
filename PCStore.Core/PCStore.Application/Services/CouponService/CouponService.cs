@@ -45,7 +45,7 @@ namespace PCStore.Application.Services.CouponService
             return result;
         }
 
-        public async Task<Result> CouponIsValid(IsCouponValidQuery req, CancellationToken cancellation)
+        public async Task<TaskResult<IsCouponValidResult>> CouponIsValid(IsCouponValidQuery req, CancellationToken cancellation)
         {
             var result = await mediator.Send(req, cancellation);
             return result;

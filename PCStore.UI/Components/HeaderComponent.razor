@@ -47,7 +47,7 @@
     private async Task Logout()
     {
         await AuthService.RemoveToken();
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/login");
     }
 
     public void Dispose()

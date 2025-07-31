@@ -24,7 +24,7 @@ namespace PCStore.Application.Services.CouponService
         Task<Result> ActiveCoupon(ActiveCouponCommand request, CancellationToken cancellation);
         Task<TaskListResult<AdminGetAllCouponsResult>> AdminGetAllCoupons(AdminGetAllCouponsQuery req, CancellationToken cancellation);
         Task<TaskResult<ServiceUpdateCouponResult>> UpdateCoupon(ServiceUpdateCouponCommand req, CancellationToken cancellation);
-        Task<Result> CouponIsValid(IsCouponValidQuery req, CancellationToken cancellation);
+        Task<TaskResult<IsCouponValidResult>> CouponIsValid(IsCouponValidQuery req, CancellationToken cancellation);
         Task<TaskListResult<GetAllCouponUsagesResult>> GetAllCouponUsages(GetAllCouponUsagesQuery request, CancellationToken cancellation);
     }
 }

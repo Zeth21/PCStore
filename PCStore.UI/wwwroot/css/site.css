@@ -63,6 +63,32 @@
         .login-form button:hover {
             background-color: #005ea1;
         }
+.auth-tabs {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+    .auth-tabs button {
+        padding: 0.5rem 1rem;
+        border: 1px solid #ccc;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+        .auth-tabs button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 400px;
+}
 
 .sidebar {
     width: 250px;
@@ -574,7 +600,7 @@
     .slider-button:hover {
         background-color: rgba(0, 0, 0, 0.6);
     }
-
+    /*- CSS*/
 .add-to-cart-button {
     margin-top: 8px;
     padding: 8px;
@@ -694,4 +720,70 @@
 
     .remove-btn:hover {
         background-color: rgba(220, 53, 69, 0.1);
+    }
+
+.coupon-check-section {
+    margin: 1rem 0;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.coupon-input {
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.coupon-button {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .coupon-button:hover {
+        background-color: #218838;
+    }
+
+.applied-coupon-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    max-width: 300px;
+    background-color: #d1e7dd;
+    color: #0f5132;
+    padding: 0.75rem 2.2rem 0.75rem 1rem; /* sağ boşluk çarpı için */
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.remove-coupon-btn {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: #0f5132;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-weight: bold;
+}
+
+    .remove-coupon-btn:hover {
+        color: #dc3545;
     }

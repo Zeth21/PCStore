@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -7,6 +8,7 @@ using PCStore.Application.Features.CQRSDesignPattern.Queries.UserQueries;
 using PCStore.Application.Services.UserService;
 using PCStore.Application.Services.UserService.ServiceDTO;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace PCStore.API.Controllers
 {
@@ -33,16 +35,17 @@ namespace PCStore.API.Controllers
         }
 
         [HttpPost("Account/Create")]
-        public async Task<IActionResult> AccountCreate([FromBody]CreateUser request, CancellationToken cancellation = default)
+        public async Task<IActionResult> AccountCreate([FromBody]CreateUserCommand request, CancellationToken cancellation = default)
         {
             var confirmationLink = Url.Action("EmailConfirm", "User",
                 new { userId = "{userId}", token = "{token}"},
                 protocol: Request.Scheme);
             if (confirmationLink is null)
                 return BadRequest("Something went wrong...");
-            request.Url = confirmationLink;
-            var result = await _userService.CreateUser(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            var req = new CreateUser { User = request };
+            req.Url = confirmationLink;
+            var result = await _userService.CreateUser(req, cancellation);
+            return StatusCode(result.StatusCode, result.Data);
         }
 
         [HttpPost("Account/Update")]
@@ -55,7 +58,8 @@ namespace PCStore.API.Controllers
         [HttpGet("Account/ResetPassword")]
         public async Task<IActionResult> AccountResetPassword([FromQuery]string userId, [FromQuery]string token, [FromQuery]string password, CancellationToken cancellation = default) 
         {
-            token = Uri.UnescapeDataString(token);
+            token = WebUtility.UrlDecode(token);
+            token = token.Replace(' ', '+');
             var request = new UpdatePasswordCommand
             {
                 UserId = userId,
@@ -69,12 +73,7 @@ namespace PCStore.API.Controllers
         [HttpPost("Email/ResetPassword")]
         public async Task<IActionResult> EmailResetPassword([FromBody] PasswordResetEmail request, CancellationToken cancellation = default)
         {
-            var url = Url.Action("AccountResetPassword", "User",
-                new { userId = "{userId}", token = "{token}" },
-                protocol: Request.Scheme);
-            if (url is null)
-                return BadRequest("Something went wrong...");
-            request.Url = url;
+            request.Url = "https://localhost:7256/resetpassword?userId={userId}&token={token}";
             var result = await _userService.SendPasswordResetTokenToMail(request, cancellation);
             return StatusCode(result.StatusCode, result);
         }

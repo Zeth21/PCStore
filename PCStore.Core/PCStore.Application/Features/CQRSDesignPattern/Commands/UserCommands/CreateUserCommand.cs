@@ -12,13 +12,9 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Commands.UserCommands
 {
     public class CreateUserCommand : IRequest<TaskResult<CreateUserResult>>
     {
-        [Required]
         public required string Name { get; set; }
-        [Required]
         public required string Surname { get; set; }
-        [Required]
         public required string Email { get; set; }
-        [Required]
         public required string Password { get; set; }
     }
 }

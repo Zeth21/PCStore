@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PCStore.Application.Features.CQRSDesignPattern.Results.CouponUsageResults;
 using PCStore.UI.Models.Commands.ShopCartCommands;
 using PCStore.UI.Models.Results.CartResults;
 using System.Net.Http.Json;
+using static System.Net.WebRequestMethods;
 
 public class CartService
 {
@@ -98,6 +100,30 @@ public class CartService
 
         var result = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
         return result;
+    }
+
+
+    public async Task<IsCouponValidResult?> CouponIsValidAsync(string couponCode)
+    {
+        var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "jwt_token");
+
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+        else if (string.IsNullOrWhiteSpace(token))
+        {
+            _navigationManager.NavigateTo($"/login?returnUrl=/cart", forceLoad: true);
+            return null;
+        }
+        var response = await _httpClient.GetAsync($"api/Coupon/isValid?couponCode={Uri.EscapeDataString(couponCode)}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<IsCouponValidResult>();
+        }
+        return null; // veya exception fırlatılabilir
     }
 
 }

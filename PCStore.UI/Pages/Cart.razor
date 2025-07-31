@@ -3,8 +3,17 @@
 @using PCStore.UI.Models.Results.CartResults
 @inject CartService cartService
 
-<div class="cart-container">
-    <h3>My Cart</h3>
+<div class="cart-container" style="position: relative">
+    <h3 style="align-self:center">My Cart</h3>
+    @if (!string.IsNullOrEmpty(appliedCouponCode))
+    {
+        <div class="applied-coupon-badge">
+            <button class="remove-coupon-btn" @onclick="RemoveCoupon">✖</button>
+            Kupon Uygulandı: <strong>@appliedCouponCode</strong>
+            <span style="display: none">@appliedCouponId</span>
+        </div>
+    }
+
 
     @if (isLoading)
     {
@@ -26,6 +35,16 @@
             }
         </div>
 
+        <div class="coupon-check-section">
+
+            <input type="text" @bind="couponCode" placeholder="Kupon kodu girin..." class="coupon-input" />
+            <button class="coupon-button" @onclick="CouponIsValid">Kuponu Kontrol Et</button>
+            @if (!string.IsNullOrEmpty(couponMessage))
+            {
+                <div class="alert-message">@couponMessage</div>
+            }
+        </div>
+
         <div class="cart-items-grid">
             @foreach (var item in cartItems.CartItems)
             {
@@ -42,6 +61,12 @@
 @code {
     private BulkGetShopCartItemsResult? cartItems;
     private bool isLoading = true;
+    private string couponCode = string.Empty;
+    private string? couponMessage;
+
+    // Yeni alanlar
+    private string? appliedCouponCode;
+    private int? appliedCouponId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,13 +76,47 @@
     private async Task LoadCartItemsAsync()
     {
         isLoading = true;
-        cartItems = await cartService.GetShopCartItemsAsync();
+        cartItems = await cartService.GetShopCartItemsAsync(appliedCouponId);
         isLoading = false;
         StateHasChanged();
     }
 
     private async Task HandleItemRemoved(int removedItemId)
     {
+        await LoadCartItemsAsync();
+    }
+
+    private async Task CouponIsValid()
+    {
+        if (string.IsNullOrWhiteSpace(couponCode))
+        {
+            couponMessage = "Lütfen bir kupon kodu girin.";
+            return;
+        }
+
+        var result = await cartService.CouponIsValidAsync(couponCode);
+
+        if (result is not null)
+        {
+            couponMessage = result.CouponCode;
+            appliedCouponCode = result.CouponCode;
+            appliedCouponId = result.CouponId;
+
+            await LoadCartItemsAsync();
+        }
+        else
+        {
+            couponMessage = "Kupon geçersiz veya süresi dolmuş.";
+            appliedCouponCode = null;
+            appliedCouponId = null;
+        }
+    }
+    private async void RemoveCoupon()
+    {
+        appliedCouponCode = null;
+        appliedCouponId = null;
+        couponMessage = null;
+        couponCode = string.Empty;
         await LoadCartItemsAsync();
     }
 }

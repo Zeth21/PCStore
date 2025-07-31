@@ -4,44 +4,143 @@
 @inject AuthService AuthService
 @inject NavigationManager Navigation
 
-<h3>Giriş Yap</h3>
+<h3>
+    @(CurrentMode switch
+    {
+        AuthMode.Login => "Giriş Yap",
+        AuthMode.Register => "Kayıt Ol",
+        AuthMode.ForgotPassword => "Şifre Yenile",
+        _ => ""
+    })
+</h3>
+
+<div class="auth-tabs">
+    <button @onclick="@(() => SwitchMode(AuthMode.Login))" class="@((CurrentMode == AuthMode.Login ? "active" : ""))">Giriş Yap</button>
+    <button @onclick="@(() => SwitchMode(AuthMode.Register))" class="@((CurrentMode == AuthMode.Register ? "active" : ""))">Kayıt Ol</button>
+    <button @onclick="@(() => SwitchMode(AuthMode.ForgotPassword))" class="@((CurrentMode == AuthMode.ForgotPassword ? "active" : ""))">Şifre Yenile</button>
+</div>
 
 <div class="login-form">
-    <label>Email:</label>
-    <input @bind="LoginModel.Email" type="email" />
+    @if (CurrentMode == AuthMode.Login)
+    {
+        <label>Email:</label>
+        <input @bind="LoginModel.Email" type="email" />
 
-    <label>Şifre:</label>
-    <input @bind="LoginModel.Password" type="password" />
+        <label>Şifre:</label>
+        <input @bind="LoginModel.Password" type="password" />
 
-    <button @onclick="HandleLogin" disabled="@isLoading">Giriş Yap</button>
+        <button @onclick="HandleLogin" disabled="@isLoading">Giriş Yap</button>
+    }
+    else if (CurrentMode == AuthMode.Register)
+    {
+        <label>Ad:</label>
+        <input @bind="RegisterModel.Name" type="text" />
+
+        <label>Soyad:</label>
+        <input @bind="RegisterModel.Surname" type="text" />
+
+        <label>Email:</label>
+        <input @bind="RegisterModel.Email" type="email" />
+
+        <label>Şifre:</label>
+        <input @bind="RegisterModel.Password" type="password" />
+
+        <button @onclick="HandleRegister" disabled="@isLoading">Kayıt Ol</button>
+    }
+    else if (CurrentMode == AuthMode.ForgotPassword)
+    {
+        <label>Email:</label>
+        <input @bind="ForgotPasswordEmail" type="email" />
+
+        <button @onclick="HandleForgotPassword" disabled="@isLoading">Şifre Sıfırlama Linki Gönder</button>
+    }
 
     @if (!string.IsNullOrEmpty(ErrorMessage))
     {
         <p style="color:red;">@ErrorMessage</p>
     }
-</div>
 
+    @if (!string.IsNullOrEmpty(SuccessMessage))
+    {
+        <p style="color:green;">@SuccessMessage</p>
+    }
+</div>
 @code {
+    private enum AuthMode { Login, Register, ForgotPassword }
+    private AuthMode CurrentMode = AuthMode.Login;
+
     private LoginCommand LoginModel = new();
+    private RegisterCommand RegisterModel = new();
+    private string ForgotPasswordEmail = string.Empty;
+
     private bool isLoading = false;
-    private string ErrorMessage;
+    private string? ErrorMessage;
+    private string? SuccessMessage;
+
+    private void SwitchMode(AuthMode mode)
+    {
+        CurrentMode = mode;
+        ErrorMessage = null;
+        SuccessMessage = null;
+    }
 
     private async Task HandleLogin()
     {
         isLoading = true;
         ErrorMessage = null;
-
         try
         {
             var result = await AuthService.LoginAsync(LoginModel);
             if (result)
-            {
                 Navigation.NavigateTo("/");
-            }
             else
-            {
                 ErrorMessage = "Geçersiz email veya şifre.";
-            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Hata: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleRegister()
+    {
+        isLoading = true;
+        ErrorMessage = null;
+        try
+        {
+            var result = await AuthService.RegisterAsync(RegisterModel);
+            if (result)
+                Navigation.NavigateTo("/");
+            else
+                ErrorMessage = "Kayıt başarısız. Lütfen bilgileri kontrol edin.";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Hata: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleForgotPassword()
+    {
+        isLoading = true;
+        ErrorMessage = null;
+        SuccessMessage = null;
+
+        try
+        {
+            var result = await AuthService.SendPasswordResetAsync(ForgotPasswordEmail);
+            if (result)
+                SuccessMessage = "Şifre sıfırlama bağlantısı email adresinize gönderildi.";
+            else
+                ErrorMessage = "Şifre sıfırlama işlemi başarısız oldu.";
         }
         catch (Exception ex)
         {
