@@ -21,6 +21,7 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.OrderHandlers
             var orders = await context.Orders
                 .Where(x => x.OrderUserId == request.UserId)
                 .AsNoTracking()
+                .OrderByDescending(x => x.OrderDate)
                 .ProjectTo<UserGetOrderListResult>(mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
             if (orders.Count <= 0)

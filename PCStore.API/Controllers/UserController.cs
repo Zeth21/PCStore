@@ -9,6 +9,7 @@ using PCStore.Application.Services.UserService;
 using PCStore.Application.Services.UserService.ServiceDTO;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
+using System.Security.Claims;
 
 namespace PCStore.API.Controllers
 {
@@ -37,13 +38,8 @@ namespace PCStore.API.Controllers
         [HttpPost("Account/Create")]
         public async Task<IActionResult> AccountCreate([FromBody]CreateUserCommand request, CancellationToken cancellation = default)
         {
-            var confirmationLink = Url.Action("EmailConfirm", "User",
-                new { userId = "{userId}", token = "{token}"},
-                protocol: Request.Scheme);
-            if (confirmationLink is null)
-                return BadRequest("Something went wrong...");
             var req = new CreateUser { User = request };
-            req.Url = confirmationLink;
+            req.Url = "https://localhost:7256/confirmemail?userId={userId}&token={token}";
             var result = await _userService.CreateUser(req, cancellation);
             return StatusCode(result.StatusCode, result.Data);
         }
@@ -79,7 +75,7 @@ namespace PCStore.API.Controllers
         }
 
         [HttpGet("Email/Confirm")]
-        public async Task<IActionResult> EmailConfirm([FromQuery]string userId, [FromQuery]string token, CancellationToken cancellationToken = default) 
+        public async Task<IActionResult> EmailConfirm([FromQuery] string userId, [FromQuery] string token, CancellationToken cancellationToken = default) 
         {
             var request = new ConfirmEmail { UserId = userId, Token = token };
             var result = await _userService.ConfirmEmail(request, cancellationToken);

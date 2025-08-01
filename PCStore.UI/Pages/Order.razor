@@ -1,0 +1,59 @@
+﻿@page "/order"
+@using PCStore.UI.Models.Results.OrderResults
+@using PCStore.UI.Services
+@inject OrderService orderService
+
+<h2 class="user-orders-title">🧾 Siparişlerim</h2>
+
+@if (isLoading)
+{
+    <p class="user-orders-loading">Yükleniyor...</p>
+}
+else if (Orders is null || !Orders.Any())
+{
+    <p class="user-orders-empty">Henüz bir siparişiniz bulunmamaktadır.</p>
+}
+else
+{
+    <div class="user-orders-container">
+        @foreach (var order in Orders)
+        {
+            <div class="user-orders-card @(order.OrderIsActive ? "user-orders-active" : "user-orders-inactive")">
+                <div class="user-orders-images">
+                    @foreach (var photo in order.ProductMainPhotoUrls.Take(3))
+                    {
+                        <img src="https://localhost:44393/product-photos/@photo" alt="Product Image" />
+                    }
+                    @if (order.ProductMainPhotoUrls.Count > 3)
+                    {
+                        <span class="user-orders-image-count">+@((order.ProductMainPhotoUrls.Count) - 3)</span>
+                    }
+                </div>
+
+                <div class="user-orders-details">
+                    <p><strong>Sipariş No:</strong> @order.OrderId</p>
+                    <p><strong>Tarih:</strong> @order.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+                    <p><strong>Toplam Tutar:</strong> @order.OrderTotalCost ₺</p>
+                    <p><strong>Adres:</strong> @order.AddressName</p>
+                    <p><strong>Durum:</strong> @order.StatusName (@order.StatusDate.ToString("dd.MM.yyyy HH:mm"))</p>
+                    @if (order.OrderDeliverDate.HasValue)
+                    {
+                        <p><strong>Teslim Tarihi:</strong> @order.OrderDeliverDate.Value.ToString("dd.MM.yyyy")</p>
+                    }
+                    <a href="/orderdetails/@order.OrderId" class="user-orders-detail-link">Detayları Gör</a>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<UserGetOrderListResult> Orders = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Orders = await orderService.GetUserOrdersAsync();
+        isLoading = false;
+    }
+}

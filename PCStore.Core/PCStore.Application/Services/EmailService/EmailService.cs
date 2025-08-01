@@ -26,8 +26,8 @@ namespace PCStore.Application.Services.EmailService
                 return;
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(checkUser);
             var encodedToken = HttpUtility.UrlEncode(token);
-            url = url.Replace("%7BuserId%7D", userId)
-                     .Replace("%7Btoken%7D", encodedToken);
+            url = url.Replace("{userId}", userId)
+                     .Replace("{token}", encodedToken);
             string subject = "Welcome to PCStore!";
             string body = $"Click the link below to verify your email!  <a href = '{url}'>" + url + "</a>";
             using var client = new SmtpClient(_smtpSettings.Server, _smtpSettings.Port)

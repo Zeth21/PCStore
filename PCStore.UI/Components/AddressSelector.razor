@@ -1,0 +1,68 @@
+﻿@using PCStore.UI.Models.Results.AddressResults
+@using PCStore.UI.Services
+@inject AddressService addressService
+
+<div class="address-selector-container">
+    <label class="address-selector-label">Teslimat Adresi</label>
+
+    @if (Addresses is not null && Addresses.Any())
+    {
+        <select id="addressDropdown" class="address-selector-dropdown" @onchange="HandleAddressChange">
+            <option disabled value>-- Adres Seçin --</option>
+            @foreach (var address in Addresses)
+            {
+                <option value="@address.Id" selected="@(SelectedAddress?.Id == address.Id)">
+                    @address.AddressName
+                </option>
+            }
+        </select>
+
+        @if (SelectedAddress is not null)
+        {
+            <div class="address-selector-details">
+                <p>@SelectedAddress.Description</p>
+            </div>
+        }
+    }
+    else
+    {
+        <button class="address-selector-add-btn" @onclick="OnAddAddressClicked">Adres Ekle</button>
+    }
+</div>
+
+@code {
+    private List<GetAllAddressesResult>? Addresses;
+    private GetAllAddressesResult? SelectedAddress;
+
+    [Parameter]
+    public EventCallback<GetAllAddressesResult> OnAddressSelected { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Addresses = await addressService.GetAllAsync();
+
+        if (Addresses is not null && Addresses.Any())
+        {
+            SelectedAddress = Addresses.First();
+            await OnAddressSelected.InvokeAsync(SelectedAddress);
+        }
+    }
+
+    private async Task HandleAddressChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var selectedId))
+        {
+            SelectedAddress = Addresses?.FirstOrDefault(a => a.Id == selectedId);
+
+            if (OnAddressSelected.HasDelegate && SelectedAddress is not null)
+            {
+                await OnAddressSelected.InvokeAsync(SelectedAddress);
+            }
+        }
+    }
+
+    private void OnAddAddressClicked()
+    {
+        // Adres ekleme işlemi yapılacaksa burada handle edilir
+    }
+}

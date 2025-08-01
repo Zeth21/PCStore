@@ -14,11 +14,16 @@ namespace PCStore.API.Controllers
     [ApiController]
     public class OrderController(IOrderService service) : ControllerBase
     {
+        [Authorize(Roles = "Customer")]
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] ServiceCreateOrderCommand request, CancellationToken cancellation = default) 
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                return Unauthorized();
+            request.UserId = userId;
             var result = await service.CreateOrder(request, cancellation);
-            return StatusCode(result.StatusCode,result);
+            return StatusCode(result.StatusCode,result.Data);
         }
 
         [Authorize(Roles = "Customer")]
@@ -30,7 +35,7 @@ namespace PCStore.API.Controllers
                 return Unauthorized();
             var request = new ServiceGetOrderDetailsByOrderIdCommand { OrderId = orderId, UserId = userId };
             var result = await service.UserGetOrderById(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
 
         [Authorize(Roles = "Customer")]
@@ -42,7 +47,7 @@ namespace PCStore.API.Controllers
                 return Unauthorized();
             var request = new UserGetOrderListQuery { UserId = userId };
             var result = await service.UserGetOrderList(request, cancellation);
-            return StatusCode(result.StatusCode,result);
+            return StatusCode(result.StatusCode,result.Data);
         }
         
         [HttpGet("{orderId}/status")]
@@ -50,7 +55,7 @@ namespace PCStore.API.Controllers
         {
             var request = new ListGetOrderStatusByOrderIdQuery { OrderId = orderId };
             var result = await service.GetOrderStatusList(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
 
         

@@ -787,3 +787,304 @@
     .remove-coupon-btn:hover {
         color: #dc3545;
     }
+
+/* ADDRESS SELECTOR COMPONENT CSS */
+.address-selector-container {
+    margin-top: 1.5rem;
+    padding: 1.2rem;
+    background-color: #fdfdfd;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    max-width: 600px;
+}
+
+.address-selector-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-size: 1rem;
+}
+
+.address-selector-dropdown {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #fff;
+    color: #333;
+    appearance: none;
+    cursor: pointer;
+}
+
+    .address-selector-dropdown:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+    }
+
+.address-selector-details {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: #eef6f9;
+    border-left: 4px solid #007bff;
+    border-radius: 4px;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+.order-create-unique-btn {
+    background-color: #4CAF50; /* Yeşil */
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+    .order-create-unique-btn:hover {
+        background-color: #45a049;
+    }
+
+/*ORDER DETAİLS*/
+
+
+.order-details-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.order-details-title {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: bold;
+}
+
+.order-details-info {
+    margin-bottom: 30px;
+    line-height: 1.7;
+    font-size: 16px;
+    color: #444;
+}
+
+.order-details-product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.order-details-product-card {
+    display: flex;
+    gap: 20px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #fafafa;
+}
+
+.order-details-product-img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+
+.order-details-product-content {
+    flex: 1;
+    font-size: 15px;
+    color: #333;
+}
+
+    .order-details-product-content h4 {
+        font-size: 18px;
+        margin-bottom: 5px;
+        color: #222;
+    }
+
+.order-details-old-price {
+    color: #999;
+    font-style: italic;
+}
+
+/* Geçmiş Durumları Görüntüle link veya buton stili */
+.order-details-show-status-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+    .order-details-show-status-link:hover {
+        color: #0056b3;
+    }
+
+/* Durum geçmişi liste stili */
+.order-details-status-list {
+    margin-top: 10px;
+    padding-left: 20px;
+    list-style: disc;
+}
+
+    .order-details-status-list li {
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .order-details-status-list .status-name {
+        font-weight: bold;
+        margin-right: 8px;
+    }
+
+    .order-details-status-list .status-date {
+        color: gray;
+        font-size: 13px;
+    }
+
+/*ORDER SAYFASI*/
+
+.user-orders-title {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.user-orders-loading,
+.user-orders-empty {
+    font-size: 16px;
+    color: #777;
+    margin-top: 20px;
+}
+
+.user-orders-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.user-orders-card {
+    display: flex;
+    gap: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    background-color: #fff;
+    transition: box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Aktif siparişler yeşil ton */
+.user-orders-active {
+    background-color: #e6f4ea; /* Açık yeşil */
+    border-color: #3c9d4e; /* Daha koyu yeşil kenarlık */
+    color: #2f5233;
+}
+
+/* Pasif siparişler gri ton */
+.user-orders-inactive {
+    background-color: #f5f5f5; /* Açık gri */
+    border-color: #999999; /* Gri kenarlık */
+    color: #555555;
+}
+
+.user-orders-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.user-orders-images {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    min-width: 120px;
+}
+
+    .user-orders-images img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+.user-orders-image-count {
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 12px;
+}
+
+.user-orders-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 15px;
+    /* margin-left yerine gap ile zaten ayarlandı */
+}
+
+.user-orders-detail-link {
+    margin-top: 8px;
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+    width: fit-content;
+}
+
+    .user-orders-detail-link:hover {
+        background-color: #0056b3;
+    }
+
+.cart-applied-coupon-badge {
+    display: flex;
+    align-items: center;
+    background-color: #e9f5ff;
+    border: 1px solid #a3d3f5;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #0077cc;
+    margin-bottom: 16px;
+    gap: 8px;
+    width: fit-content;
+}
+
+.cart-remove-coupon-btn {
+    background: transparent;
+    border: none;
+    color: #0077cc;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+    font-weight: bold;
+}
+
+    .cart-remove-coupon-btn:hover {
+        color: #cc0000;
+    }

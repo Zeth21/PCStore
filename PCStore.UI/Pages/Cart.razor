@@ -1,62 +1,63 @@
 ﻿@page "/cart"
 @using PCStore.UI.Components
+@using PCStore.UI.Models.Results.AddressResults
 @using PCStore.UI.Models.Results.CartResults
+@using PCStore.UI.Models.Commands.OrderCommands
+@using PCStore.UI.Services
 @inject CartService cartService
+@inject OrderService orderService
+@inject NavigationManager navigationManager
 
-<div class="cart-container" style="position: relative">
-    <h3 style="align-self:center">My Cart</h3>
+@if (cartItems is not null)
+{
+    @* Kupon uygulandı badge *@
     @if (!string.IsNullOrEmpty(appliedCouponCode))
     {
-        <div class="applied-coupon-badge">
-            <button class="remove-coupon-btn" @onclick="RemoveCoupon">✖</button>
+        <div class="cart-applied-coupon-badge">
+            <button class="cart-remove-coupon-btn" @onclick="RemoveCoupon">✖</button>
             Kupon Uygulandı: <strong>@appliedCouponCode</strong>
-            <span style="display: none">@appliedCouponId</span>
         </div>
     }
 
 
-    @if (isLoading)
-    {
-        <p>Loading...</p>
-    }
-    else if (cartItems is not null)
-    {
-        <div class="cart-summary">
-            <p><strong>Total Cost:</strong> @cartItems.TotalCost ₺</p>
+    <div class="cart-summary">
+        <p><strong>Total Cost:</strong> @cartItems.TotalCost ₺</p>
 
-            @if (cartItems.TotalCouponDiscount.HasValue)
-            {
-                <p><strong>Coupon Discount:</strong> -@cartItems.TotalCouponDiscount ₺</p>
-            }
+        @if (cartItems.TotalCouponDiscount.HasValue)
+        {
+            <p><strong>Coupon Discount:</strong> -@cartItems.TotalCouponDiscount ₺</p>
+        }
 
-            @if (cartItems.TotalDiscount.HasValue && cartItems.TotalDiscount.Value > 0)
-            {
-                <p><strong>Product Total Discount:</strong> -@cartItems.TotalDiscount ₺</p>
-            }
-        </div>
+        @if (cartItems.TotalDiscount.HasValue && cartItems.TotalDiscount.Value > 0)
+        {
+            <p><strong>Product Total Discount:</strong> -@cartItems.TotalDiscount ₺</p>
+        }
+    </div>
 
-        <div class="coupon-check-section">
+    <div class="coupon-check-section">
+        <input type="text" @bind="couponCode" placeholder="Kupon kodu girin..." class="coupon-input" />
+        <button class="coupon-button" @onclick="CouponIsValid">Kuponu Kontrol Et</button>
+        @if (!string.IsNullOrEmpty(couponMessage))
+        {
+            <div class="alert-message">@couponMessage</div>
+        }
+    </div>
 
-            <input type="text" @bind="couponCode" placeholder="Kupon kodu girin..." class="coupon-input" />
-            <button class="coupon-button" @onclick="CouponIsValid">Kuponu Kontrol Et</button>
-            @if (!string.IsNullOrEmpty(couponMessage))
-            {
-                <div class="alert-message">@couponMessage</div>
-            }
-        </div>
+    <div class="cart-items-grid">
+        @foreach (var item in cartItems.CartItems)
+        {
+            <ShopCartProduct Item="item" OnRemoved="HandleItemRemoved" />
+        }
+    </div>
 
-        <div class="cart-items-grid">
-            @foreach (var item in cartItems.CartItems)
-            {
-                <ShopCartProduct Item="item" OnRemoved="HandleItemRemoved" />
-            }
-        </div>
-    }
-    else
-    {
-        <p>Sepetiniz boş.</p>
-    }
-</div>
+    <AddressSelector OnAddressSelected="HandleAddressSelected" />
+
+    <button class="order-create-unique-btn" @onclick="CreateOrderAsync">Siparişi Oluştur</button>
+}
+@if (cartItems is null)
+{
+    <h2>Sepetinizde herhangi bir ürün bulunmuyor.</h2>
+}
 
 @code {
     private BulkGetShopCartItemsResult? cartItems;
@@ -64,9 +65,9 @@
     private string couponCode = string.Empty;
     private string? couponMessage;
 
-    // Yeni alanlar
     private string? appliedCouponCode;
     private int? appliedCouponId;
+    private int? selectedAddressId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -111,7 +112,40 @@
             appliedCouponId = null;
         }
     }
-    private async void RemoveCoupon()
+
+    private Task HandleAddressSelected(GetAllAddressesResult address)
+    {
+        selectedAddressId = address.Id;
+        return Task.CompletedTask;
+    }
+
+    private async Task CreateOrderAsync()
+    {
+        if (selectedAddressId is null)
+        {
+            couponMessage = "Lütfen teslimat adresi seçin.";
+            return;
+        }
+
+        var command = new ServiceCreateOrderCommand
+            {
+                AddressId = selectedAddressId.Value,
+                CouponId = appliedCouponId
+            };
+
+        var result = await orderService.CreateOrderAsync(command);
+
+        if (result is not null)
+        {
+            navigationManager.NavigateTo($"/orderdetails/{result.OrderId}");
+        }
+        else
+        {
+            couponMessage = "Sipariş oluşturulamadı. Lütfen tekrar deneyin.";
+        }
+    }
+
+    private async Task RemoveCoupon()
     {
         appliedCouponCode = null;
         appliedCouponId = null;

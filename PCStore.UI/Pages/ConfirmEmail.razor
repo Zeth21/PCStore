@@ -1,0 +1,61 @@
+﻿@page "/confirmemail"
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Email Doğrulama</h3>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <p style="color:@(IsSuccess ? "green" : "red")">@Message</p>
+}
+else
+{
+    <p>Doğrulama yapılıyor, lütfen bekleyin...</p>
+}
+
+@code {
+    private string? Message;
+    private bool IsSuccess = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(Navigation.Uri);
+        var query = uri.Query.TrimStart('?');
+
+        var parameters = query.Split('&', StringSplitOptions.RemoveEmptyEntries)
+                              .Select(p => p.Split('=', 2))
+                              .Where(p => p.Length == 2)
+                              .ToDictionary(p => p[0], p => p[1]); // decode yok
+
+        parameters.TryGetValue("userId", out var userId);
+        parameters.TryGetValue("token", out var token);
+
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+        {
+            Message = "Geçersiz bağlantı.";
+            return;
+        }
+
+        try
+        {
+            var response = await Http.GetAsync($"api/User/Email/Confirm?userId={userId}&token={token}");
+            if (response.IsSuccessStatusCode)
+            {
+                Message = "Email başarıyla doğrulandı.";
+                IsSuccess = true;
+                await Task.Delay(2000);
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                Message = "Email doğrulama başarısız oldu. Link süresi dolmuş olabilir.";
+                IsSuccess = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Bir hata oluştu: {ex.Message}";
+            IsSuccess = false;
+        }
+    }
+}

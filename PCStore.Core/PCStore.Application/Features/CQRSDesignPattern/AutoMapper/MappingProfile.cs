@@ -280,10 +280,17 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.OrderDeliverDate, o => o.MapFrom(s => s.OrderDeliverDate))
                 .ForMember(x => x.OrderIsActive, o => o.MapFrom(s => s.OrderIsActive))
                 .ForMember(x => x.AddressName, o => o.MapFrom(s => s.Address!.AddressName))
-                .ForMember(x => x.StatusDate, o => o.MapFrom(s => s.OrderStatus!.OrderByDescending(os => os.StatusDate).FirstOrDefault()!.StatusDate))
-                .ForMember(x => x.StatusName, o => o.MapFrom(s => s.OrderStatus!.OrderByDescending(os => os.StatusDate).FirstOrDefault()!.StatusName))
+                .ForMember(x => x.StatusDate, o => o.MapFrom(s => s.OrderStatus!
+                    .OrderByDescending(os => os.StatusDate)
+                    .FirstOrDefault()!.StatusDate))
+                .ForMember(x => x.StatusName, o => o.MapFrom(s => s.OrderStatus!
+                    .OrderByDescending(os => os.StatusDate)
+                    .FirstOrDefault() != null && s.OrderStatus.OrderByDescending(os => os.StatusDate).FirstOrDefault()!.StatusName != null
+                        ? s.OrderStatus.OrderByDescending(os => os.StatusDate).FirstOrDefault()!.StatusName.StatusNameString
+                        : "Bilinmiyor"))
                 .ForMember(x => x.ProductMainPhotoUrls, o => o.MapFrom(s => s.OrderProductList!
-                .Select(op => op.Product!.ProductMainPhotoPath).Take(3).ToList()));
+                    .Select(op => op.Product!.ProductMainPhotoPath).Take(3).ToList()));
+
             CreateMap<OrderStatus, ListGetOrderStatusByOrderIdResult>()
                 .ForMember(x => x.StatusName, o => o.MapFrom(s => s.StatusName!.StatusNameString));
             CreateMap<Notification, CreateNotificationResult>()

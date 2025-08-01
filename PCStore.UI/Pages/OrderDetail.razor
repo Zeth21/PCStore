@@ -1,0 +1,108 @@
+﻿@page "/orderdetails/{OrderId:int}"
+@using PCStore.UI.Models.Results.OrderResults
+@using PCStore.UI.Services
+@inject OrderService orderService
+
+<h2 class="order-details-title">Sipariş Detayları</h2>
+
+@if (isLoading)
+{
+    <p>Yükleniyor...</p>
+}
+else if (Order is null)
+{
+    <p class="order-details-error">❌ Sipariş bulunamadı.</p>
+}
+else
+{
+    <div class="order-details-container">
+        <div class="order-details-info">
+            <p><strong>Sipariş No:</strong> @Order.OrderId</p>
+            <p><strong>Tarih:</strong> @Order.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+            <p><strong>Toplam Tutar:</strong> @Order.OrderTotalCost ₺</p>
+            @if (Order.DiscountTotal.HasValue)
+            {
+                <p><strong>Ürün İndirimi:</strong> @Order.DiscountTotal ₺</p>
+            }
+            @if (Order.CouponDiscountTotal.HasValue)
+            {
+                <p><strong>Kupon İndirimi (@Order.CouponCode):</strong> @Order.CouponDiscountTotal ₺</p>
+            }
+            <p><strong>Adres:</strong> @Order.OrderAddress</p>
+            <p><strong>Durum:</strong> @Order.StatusName (@Order.StatusDate.ToString("dd.MM.yyyy HH:mm"))</p>
+
+            <button class="order-details-show-status-link" @onclick="LoadStatusHistoryAsync">
+                📜 Geçmiş Durumları Görüntüle
+            </button>
+
+
+            @if (OrderStatusList is not null && OrderStatusList.Any())
+            {
+                <ul class="order-details-status-list">
+                    @foreach (var status in OrderStatusList)
+                    {
+                        <li>
+                            <span class="status-name">@status.StatusName</span>
+                            <span class="status-date">@status.StatusDate.ToString("dd.MM.yyyy HH:mm")</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="order-details-product-list">
+            @foreach (var item in Order.OrderProducts)
+            {
+                <div class="order-details-product-card">
+                    <img src="https://localhost:44393/product-photos/@item.ProductMainPhotoPath" alt="Product Image" class="order-details-product-img" />
+                    <div class="order-details-product-content">
+                        <h4>@item.ProductName</h4>
+                        <p>@item.BrandName | @item.CategoryName</p>
+                        <p>Miktar: @item.ItemCount</p>
+                        <p>Birim Fiyat: @item.ProductPrice ₺</p>
+                        <p>Toplam: @item.TotalPrice ₺</p>
+
+                        @if (item.OldTotalPrice.HasValue && item.OldPrice.HasValue)
+                        {
+                            <p class="order-details-old-price">
+                                <del>@item.OldTotalPrice ₺ (@item.OldPrice ₺ x @item.ItemCount)</del>
+                            </p>
+                        }
+
+                        <p>Puan: ⭐ @item.ProductRateScore (@item.ProductTotalRate değerlendirme)</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int OrderId { get; set; }
+
+    private ServiceGetOrderDetailsByOrderIdResult? Order;
+    private List<ListGetOrderStatusByOrderIdResult>? OrderStatusList;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Order = await orderService.GetOrderDetailsByIdAsync(OrderId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Hata! " + ex.Message);
+        }
+
+        isLoading = false;
+    }
+
+    private async Task LoadStatusHistoryAsync()
+    {
+        if (OrderStatusList is null)
+        {
+            OrderStatusList = await orderService.GetOrderStatusListByOrderIdAsync(OrderId);
+        }
+    }
+}

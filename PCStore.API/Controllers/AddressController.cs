@@ -58,7 +58,7 @@ namespace PCStore.API.Controllers
                 return Unauthorized();
             var request = new GetAllAddressesQuery { UserId = userId };
             var result = await service.GetAllAddresses(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
     }
 }

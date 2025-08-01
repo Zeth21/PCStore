@@ -24,3 +24,6 @@ namespace PCStore.Application.Services.OrderService.Results
         public List<GetOrderProductListsByOrderIdResult> OrderProducts { get; set; } = null!;
     }
 }
+
+
+
