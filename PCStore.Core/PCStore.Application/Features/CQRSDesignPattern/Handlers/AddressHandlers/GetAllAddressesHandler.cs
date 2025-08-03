@@ -34,7 +34,7 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.AddressHandler
                     .ProjectTo<GetAllAddressesResult>(_mapper.ConfigurationProvider)
                     .ToListAsync(cancellationToken);
                 if (addresses.Count <= 0)
-                    return TaskListResult<GetAllAddressesResult>.NotFound("No address has found!");
+                    return TaskListResult<GetAllAddressesResult>.Success("No address has found!", new List<GetAllAddressesResult>());
                 return TaskListResult<GetAllAddressesResult>.Success("All addresses has found successfully!", addresses);
             }
             catch(Exception ex) 

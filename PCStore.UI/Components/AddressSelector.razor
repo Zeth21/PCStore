@@ -1,6 +1,7 @@
 ﻿@using PCStore.UI.Models.Results.AddressResults
 @using PCStore.UI.Services
 @inject AddressService addressService
+@inject NavigationManager navigationManager
 
 <div class="address-selector-container">
     <label class="address-selector-label">Teslimat Adresi</label>
@@ -63,6 +64,6 @@
 
     private void OnAddAddressClicked()
     {
-        // Adres ekleme işlemi yapılacaksa burada handle edilir
+        navigationManager.NavigateTo($"/userprofile");
     }
 }

@@ -13,6 +13,7 @@
 
         @if (isLoggedIn)
         {
+            <button @onclick="Profile">MyProfile</button>
             <button @onclick="Cart">MyCart</button>
             <button @onclick="Order">MyOrders</button>
             <button @onclick="Logout">Logout</button>
@@ -41,7 +42,7 @@
             StateHasChanged();
         });
     }
-
+    private void Profile() => Navigation.NavigateTo("/userprofile");
     private void Login() => Navigation.NavigateTo("/login");
     private void Cart() => Navigation.NavigateTo("/cart");
     private void Order() => Navigation.NavigateTo("/order");

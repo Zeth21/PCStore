@@ -1,0 +1,142 @@
+﻿@page "/userprofile"
+
+@using PCStore.Application.Services.UserService.ServiceDTO
+@using PCStore.UI.Models
+@using PCStore.UI.Models.Commands.AddressCommands
+@using PCStore.UI.Services
+@inject HttpClient Http
+@inject UserService userService
+@inject AddressService addressService
+@inject IJSRuntime JS
+
+<h2 class="up-title">Kullanıcı Profili</h2>
+
+@if (profileResult == null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <div class="up-profile-container">
+        <div class="up-profile-card">
+            <img src="https://localhost:44393/product-photos/@profileResult.UserProfile.ProfilePhoto" alt="Profil Fotoğrafı" class="up-profile-photo" />
+            <div class="up-profile-details">
+                <h3>@profileResult.UserProfile.Name @profileResult.UserProfile.Surname</h3>
+                <p><strong>Email:</strong> @profileResult.UserProfile.Email</p>
+                <p><strong>Telefon:</strong> @profileResult.UserProfile.PhoneNumber</p>
+            </div>
+        </div>
+
+        <div class="up-address-section">
+            <h4>Adresler</h4>
+
+            @if (profileResult.UserAddresses.Any())
+            {
+                <ul class="up-address-list">
+                    <li class="up-address-item">
+                        <strong>@profileResult.UserAddresses[0].AddressName</strong><br />
+                        <span>@profileResult.UserAddresses[0].Description</span><br />
+                        <button class="up-btn up-btn-edit" @onclick="() => EditAddress(profileResult.UserAddresses[0].Id)">Güncelle</button>
+                        <button class="up-btn up-btn-delete" @onclick="() => DeleteAddress(profileResult.UserAddresses[0].Id)">Sil</button>
+                    </li>
+
+                    @if (showAllAddresses)
+                    {
+                        @foreach (var address in profileResult.UserAddresses.Skip(1))
+                        {
+                            <li class="up-address-item">
+                                <strong>@address.AddressName</strong><br />
+                                <span>@address.Description</span><br />
+                                <button class="up-btn up-btn-edit" @onclick="() => EditAddress(address.Id)">Güncelle</button>
+                                <button class="up-btn up-btn-delete" @onclick="() => DeleteAddress(address.Id)">Sil</button>
+                            </li>
+                        }
+                    }
+                </ul>
+
+                @if (profileResult.UserAddresses.Count > 1)
+                {
+                    <button class="up-btn up-btn-toggle" @onclick="ToggleShowAddresses">
+                        @(showAllAddresses ? "Gizle" : "Tümünü Göster")
+                    </button>
+                }
+            }
+            else
+            {
+                <p>Henüz adres tanımlanmamış.</p>
+            }
+            <button class="up-btn up-btn-add" @onclick="(() => showAddressForm = true)">
+                Adres Ekle
+            </button>
+            @if (showAddressForm)
+            {
+                <div class="up-add-form-container">
+                    <input class="up-add-form-input" placeholder="Adres Başlığı" @bind="newAddressName" />
+                    <textarea class="up-add-form-textarea" placeholder="Adres Tarifi" @bind="newAddressDescription"></textarea>
+                    <button class="up-add-form-button" @onclick="CreateAddress">Oluştur</button>
+                </div>
+            }
+
+        </div>
+    </div>
+}
+
+@code {
+    private ServiceGetUserProfileResult? profileResult;
+    private bool showAllAddresses = false;
+    private bool showAddressForm = false;
+    private string newAddressName = string.Empty;
+    private string newAddressDescription = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        profileResult = await userService.GetUserProfileAsync();
+
+    }
+
+    void ToggleShowAddresses()
+    {
+        showAllAddresses = !showAllAddresses;
+    }
+
+    void EditAddress(int id)
+    {
+
+    }
+    async Task CreateAddress()
+    {
+        var request = new CreateAddressCommand
+            {
+                AddressName = newAddressName,
+                Description = newAddressDescription
+            };
+
+        var newAddress = await addressService.CreateAddress(request);
+
+        if (newAddress is not null && profileResult is not null)
+        {
+            profileResult.UserAddresses.Add(newAddress);
+
+            newAddressName = string.Empty;
+            newAddressDescription = string.Empty;
+            showAddressForm = false;
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Adres oluşturulurken bir hata oluştu.");
+        }
+    }
+
+
+    async Task DeleteAddress(int addressId)
+    {
+        if(profileResult is not null)
+        {
+            var result = await addressService.DeleteAddress(addressId);
+            if (result)
+                profileResult.UserAddresses = await addressService.GetAllAsync() ?? [];
+            else
+                await JS.InvokeVoidAsync("alert", "Something went wrong!");
+        }
+    }
+}

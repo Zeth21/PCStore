@@ -14,6 +14,7 @@ using System.Net;
 using PCStore.Application.Services.EmailService;
 using PCStore.Application.Services.EmailService.ServiceDTO;
 using System.Threading.Tasks;
+using PCStore.Application.Features.CQRSDesignPattern.Queries.AddressQueries;
 
 namespace PCStore.Application.Services.UserService
 {
@@ -40,6 +41,21 @@ namespace PCStore.Application.Services.UserService
                 return result;
             await _emailService.SendConfirmEmail(result.Data!.UserId,request.Url);
             return result;
+        }
+
+        public async Task<TaskResult<ServiceGetUserProfileResult>> GetUserProfile(GetUserProfileQuery request, CancellationToken cancellation)
+        {
+            var userInformation = await _mediator.Send(request,cancellation);
+            var addressesQuery = new GetAllAddressesQuery { UserId = request.UserId };
+            var addresses = await _mediator.Send(addressesQuery, cancellation);
+            if (userInformation.Data is null || addresses.Data is null)
+                return TaskResult<ServiceGetUserProfileResult>.Fail("Something went wrong!");
+            var result = new ServiceGetUserProfileResult
+            {
+                UserProfile = userInformation.Data,
+                UserAddresses = addresses.Data
+            };
+            return TaskResult<ServiceGetUserProfileResult>.Success("Process succeeded!", result);
         }
 
         public async Task<Result> ResetPassword(UpdatePasswordCommand request, CancellationToken cancellation)

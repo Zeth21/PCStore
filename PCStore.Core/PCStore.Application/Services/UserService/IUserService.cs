@@ -14,5 +14,6 @@ namespace PCStore.Application.Services.UserService
         public Task<Result> ConfirmEmail(ConfirmEmail request, CancellationToken cancellation);
         public Task<Result> SendPasswordResetTokenToMail(PasswordResetEmail request, CancellationToken cancellation);
         public Task<Result> ResetPassword(UpdatePasswordCommand request, CancellationToken cancellation);
+        public Task<TaskResult<ServiceGetUserProfileResult>> GetUserProfile(GetUserProfileQuery request, CancellationToken cancellation);
     }
 }

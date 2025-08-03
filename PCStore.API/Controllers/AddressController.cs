@@ -22,7 +22,7 @@ namespace PCStore.API.Controllers
                 return Unauthorized();
             request.UserId = userId;
             var result = await service.CreateAddress(request, cancellation);
-            return StatusCode(result.StatusCode, result);
+            return StatusCode(result.StatusCode, result.Data);
         }
 
         [Authorize(Roles = "Customer")]

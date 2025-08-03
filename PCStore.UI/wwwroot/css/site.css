@@ -1088,3 +1088,146 @@
     .cart-remove-coupon-btn:hover {
         color: #cc0000;
     }
+/*PROFİL SAYFASI*/
+
+.up-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+    text-align: center;
+}
+
+.up-profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background-color: #f7f7f7;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.up-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.up-profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+}
+
+.up-profile-details h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.up-profile-details p {
+    margin: 0.3rem 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+.up-address-section h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #222;
+}
+
+.up-address-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.up-address-item {
+    background-color: #ffffff;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-left: 4px solid #007acc;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.up-btn {
+    padding: 6px 12px;
+    margin-top: 0.5rem;
+    margin-right: 8px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.up-btn-edit {
+    background-color: #28a745;
+    color: white;
+}
+
+    .up-btn-edit:hover {
+        background-color: #218838;
+    }
+
+.up-btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+    .up-btn-delete:hover {
+        background-color: #c82333;
+    }
+
+.up-btn-toggle {
+    background-color: #007bff;
+    color: white;
+}
+
+    .up-btn-toggle:hover {
+        background-color: #0056b3;
+    }
+
+/*KULLANICI PROFİLİ ADRES OLUŞTURMA*/
+
+.up-add-form-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.up-add-form-input,
+.up-add-form-textarea {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.up-add-form-textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.up-add-form-button {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .up-add-form-button:hover {
+        background-color: #0056b3;
+    }

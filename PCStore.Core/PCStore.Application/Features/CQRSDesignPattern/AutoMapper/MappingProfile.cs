@@ -370,7 +370,7 @@ namespace PCStore.Application.Features.CQRSDesignPattern.AutoMapper
                 .ForMember(x => x.ProductStock, o => o.MapFrom(s => s.ProductStock))
                 .ForMember(x => x.ProductTotalRate, o => o.MapFrom(s => s.ProductTotalRate));
             CreateMap<Coupon, IsCouponValidResult>();
-
+            CreateMap<User, GetUserProfileResult>();
         }
     }
 }

@@ -21,11 +21,14 @@ namespace PCStore.API.Controllers
         private readonly IUserService _userService = userService;
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public IActionResult AdminTest()
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> GetUserProfile(CancellationToken cancellation = default)
         {
-            var result = User.Identity?.Name;
-            return Ok(result);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                return Unauthorized();
+            var result = await _userService.GetUserProfile(new GetUserProfileQuery { UserId = userId }, cancellation);
+            return StatusCode(result.StatusCode,result.Data);
         }
 
         [HttpPost]
