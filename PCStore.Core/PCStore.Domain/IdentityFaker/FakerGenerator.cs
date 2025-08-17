@@ -1,6 +1,8 @@
 ﻿using Bogus;
 using PCStore.Domain.Entities;
 using PCStore.Domain.Enum;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace PCStore.Domain.IdentityFaker
 {
@@ -138,6 +140,7 @@ namespace PCStore.Domain.IdentityFaker
             var result = new List<Notification>();
             var notificationFaker = new Faker<Notification>()
                 .RuleFor(a => a.NotificationType, f => f.PickRandom<NotifType>())
+                .RuleFor(a => a.NotificationTitle, f => f.Hacker.Phrase())
                 .RuleFor(a => a.NotificationStatus, f => f.Random.Bool())
                 .RuleFor(a => a.NotificationContent, f => f.Lorem.Paragraph(2))
                 .RuleFor(a => a.NotificationUserId, f => f.PickRandom(users).Id);
@@ -153,7 +156,7 @@ namespace PCStore.Domain.IdentityFaker
         {
             var result = new List<Order>();
             var orderFaker = new Faker<Order>()
-                .RuleFor(a => a.OrderTotalCost, f => f.Random.Int(1000, 10000))
+                .RuleFor(a => a.OrderTotalCost, f => 0)
                 .RuleFor(a => a.OrderIsActive, f => f.Random.Bool())
                 .RuleFor(a => a.OrderAddressId, f => f.PickRandom(addresses).Id)
                 .RuleFor(a => a.OrderUserId, f => f.PickRandom(users).Id);
@@ -437,6 +440,261 @@ namespace PCStore.Domain.IdentityFaker
             return result;
         }
 
+        public List<Coupon> CouponGenerator(int count)
+        {
+            var couponFaker = new Faker<Coupon>()
+                .RuleFor(c => c.CouponIsPercentage, f => f.Random.Bool())
+                .RuleFor(c => c.CouponValue, (f, c) =>
+                    c.CouponIsPercentage
+                        ? f.Random.Decimal(5, 30)
+                        : f.Random.Decimal(250, 1000))
+                .RuleFor(c => c.CouponMaxUsage, f => f.Random.Int(50, 500))
+                .RuleFor(c => c.CouponMaxUsagePerUser, f => f.Random.Int(1, 5))
+                .RuleFor(c => c.CouponMinOrderAmount, f => f.Random.Int(100, 1000))
+                .RuleFor(c => c.CreateDate, f => f.Date.Past(1))
+                .RuleFor(c => c.CouponStartTime, (f, c) => c.CreateDate.AddDays(f.Random.Int(0, 10)))
+                .RuleFor(c => c.CouponIsActive, f => f.Random.Bool(0.8f))
+                .RuleFor(c => c.CouponEndTime, (f, c) =>
+                    c.CouponIsActive
+                        ? DateTime.Now.AddDays(f.Random.Int(1, 60))
+                        : DateTime.Now.AddDays(f.Random.Int(-60, -1)))
+                .RuleFor(c => c.Description, f => f.Commerce.ProductDescription())
+                .RuleFor(c => c.CouponCode, f => f.Random.AlphaNumeric(10).ToUpper())
+                .RuleFor(c => c.CouponTargetType, f => f.PickRandom<CouponTargetType>());
+            List<Coupon> result = new List<Coupon>();
+            result = couponFaker.Generate(count);
+            return result;
+        }
 
+        public List<Discount> DiscountGenerator(int count)
+        {
+            var discountFaker = new Faker<Discount>()
+                .RuleFor(d => d.DiscountName, f => f.Commerce.Categories(1)[0])
+                .RuleFor(d => d.CreateDate, f => f.Date.Past(1))
+                .RuleFor(d => d.DiscountIsActive, f => f.Random.Bool(0.85f))
+                .RuleFor(d => d.DiscountStartDate, (f, d) => d.CreateDate.AddDays(f.Random.Int(0, 10)))
+                .RuleFor(d => d.DiscountEndDate, (f, d) =>
+                    d.DiscountIsActive
+                        ? DateTime.Now.AddDays(f.Random.Int(1, 60))
+                        : DateTime.Now.AddDays(f.Random.Int(-60, -1)))
+                .RuleFor(d => d.DiscountIsPercentage, f => f.Random.Bool())
+                .RuleFor(d => d.DiscountRate, (f, d) =>
+                    d.DiscountIsPercentage
+                        ? f.Random.Decimal(5, 30)
+                        : f.Random.Decimal(250, 1000))
+                .RuleFor(d => d.Description, f => f.Commerce.ProductDescription());
+
+            var result = new List<Discount>();
+            result = discountFaker.Generate(count);
+            return result;
+        }
+
+        public List<CouponProduct> CouponProductGenerator(List<int> CouponIds, List<int> ProductIds)
+        {
+            var result = new List<CouponProduct>();
+            var availableProducts = new List<int>(ProductIds);
+
+            foreach (var couponId in CouponIds)
+            {
+                int count = Random.Shared.Next(3, 8);
+
+                for (int j = 0; j < count && availableProducts.Count > 0; j++)
+                {
+                    int randIndex = Random.Shared.Next(0, availableProducts.Count);
+                    int productId = availableProducts[randIndex];
+                    availableProducts.RemoveAt(randIndex);
+
+                    result.Add(new CouponProduct
+                    {
+                        CouponId = couponId,
+                        ProductId = productId
+                    });
+                }
+            }
+
+            return result;
+        }
+
+
+        public List<CouponBrand> CouponBrandGenerator(List<int> CouponIds, List<int> BrandIds)
+        {
+            var result = new List<CouponBrand>();
+            var availableBrands = new List<int>(BrandIds);
+            foreach (var id in CouponIds)
+            {
+                var i = Random.Shared.Next(1, 4);
+                for (int j = 0; j < i; j++)
+                {
+                    var randIndex = Random.Shared.Next(0, availableBrands.Count);
+                    var randBrandId = availableBrands[randIndex];
+                    availableBrands.RemoveAt(randIndex);
+                    var newRecord = new CouponBrand
+                    {
+                        CouponId = id,
+                        BrandId = randBrandId
+                    };
+                    result.Add(newRecord);
+                }
+            }
+            return result;
+        }
+
+        public List<CouponCategory> CouponCategoriesGenerator(List<int> CouponIds, List<int> CategoryIds)
+        {
+            var result = new List<CouponCategory>();
+            var availableCategories = new List<int>(CategoryIds);
+            foreach (var id in CouponIds)
+            {
+                var i = Random.Shared.Next(1, 4);
+                for (int j = 0; j < i; j++)
+                {
+                    var randIndex = Random.Shared.Next(0, availableCategories.Count);
+                    var randCategoryId = availableCategories[randIndex];
+                    availableCategories.RemoveAt(randIndex);
+                    var newRecord = new CouponCategory
+                    {
+                        CouponId = id,
+                        CategoryId = randCategoryId
+                    };
+                    result.Add(newRecord);
+                }
+            }
+            return result;
+        }
+
+        public List<CouponProductType> CouponProductTypeGenerator(List<int> CouponIds, List<int> TypeIds)
+        {
+            var result = new List<CouponProductType>();
+            var availableTypeIds = new List<int>(TypeIds);
+            foreach (var id in CouponIds)
+            {
+                var randIndex = Random.Shared.Next(0, availableTypeIds.Count);
+                var randTypeId = availableTypeIds[randIndex];
+                availableTypeIds.RemoveAt(randIndex);
+                var newRecord = new CouponProductType
+                {
+                    CouponId = id,
+                    ProductTypeId = randTypeId
+                };
+                result.Add(newRecord);
+            }
+            return result;
+        }
+
+        public List<DiscountProduct> DiscountProductGenerator(List<int> DiscountIds, List<int> ProductIds)
+        {
+            var result = new List<DiscountProduct>();
+            var availableProducts = new List<int>(ProductIds);
+            foreach (var id in DiscountIds)
+            {
+                var i = Random.Shared.Next(5, 11);
+                for (int j = 0; j < i; j++)
+                {
+                    var randomIndex = Random.Shared.Next(0, availableProducts.Count);
+                    var randomProductId = ProductIds[randomIndex];
+                    availableProducts.RemoveAt(randomIndex);
+                    var newRecord = new DiscountProduct
+                    {
+                        DiscountId = id,
+                        ProductId = randomProductId
+                    };
+                    result.Add(newRecord);
+                }
+            }
+            return result;
+        }
+
+        public List<FollowedProduct> FollowedProductGenerator(List<string> UserIds, List<int> ProductIds)
+        {
+            var result = new List<FollowedProduct>();
+            foreach (var id in UserIds)
+            {
+                var availableProducts = new List<int>(ProductIds);
+                var i = Random.Shared.Next(1, 6);
+                for (int k = 0; k < i; k++)
+                {
+                    var randomIndex = Random.Shared.Next(0, availableProducts.Count);
+                    var randomProductId = availableProducts[randomIndex];
+                    availableProducts.RemoveAt(randomIndex);
+                    var newRecord = new FollowedProduct
+                    {
+                        UserId = id,
+                        ProductId = randomProductId
+                    };
+                    result.Add(newRecord);
+                }
+            }
+            return result;
+        }
+
+        public List<ShoppingCartItem> ShoppingCartItemGenerator(List<string> UserIds, List<int> ProductIds)
+        {
+            var result = new List<ShoppingCartItem>();
+            foreach (var id in UserIds)
+            {
+                var availableProducts = new List<int>(ProductIds);
+                var i = Random.Shared.Next(1, 4);
+                for (var k = 0; k < i; k++)
+                {
+                    var randomIndex = Random.Shared.Next(0, availableProducts.Count);
+                    var randomProductId = availableProducts[randomIndex];
+                    availableProducts.RemoveAt(randomIndex);
+                    var newRecord = new ShoppingCartItem
+                    {
+                        UserId = id,
+                        ProductId = randomProductId,
+                        ItemCount = Random.Shared.Next(1, 3)
+                    };
+                    result.Add(newRecord);
+                }
+            }
+            return result;
+        }
+
+        public List<StatusName> StatusNameGenerator()
+        {
+            var result = new List<StatusName>();
+            var statusList = new List<string>
+            {
+                "Pending",
+                "Paid",
+                "Processing",
+                "Shipped",
+                "Delivered",
+                "Cancelled"
+            };
+            foreach (var status in statusList) 
+            {
+                var newRecord = new StatusName
+                {
+                    StatusNameString = status
+                };
+                result.Add(newRecord);
+            }
+            return result;
+        }
+
+        public List<OrderStatus> OrderStatusGenerator(List<Order> Orders) 
+        {
+            var result = new List<OrderStatus>();
+            foreach(var order in Orders) 
+            {
+                int timeCounter = -1;
+                var i = Random.Shared.Next(1,7);
+                for(int j = 1; j <= i; j++) 
+                {
+                    if (i == 6 && j == 5)
+                        continue;
+                    var newRecord = new OrderStatus
+                    {
+                        OrderId = order.OrderId,
+                        StatusDate = order.OrderDate.AddHours(timeCounter + j),
+                        StatusNameId = j
+                    };
+                    result.Add(newRecord);
+                }
+            }
+            return result;
+        }
     }
 }

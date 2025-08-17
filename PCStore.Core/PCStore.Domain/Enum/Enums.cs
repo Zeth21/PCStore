@@ -31,4 +31,15 @@
         Brands = 3,
         ProductTypes = 4,
     }
+
+    public enum StatusNameEnum
+    {
+        Pending = 1,
+        Paid = 2,
+        Processing = 3,
+        Shipped = 4,
+        Delivered = 5,
+        Cancelled = 6
+    }
+
 }

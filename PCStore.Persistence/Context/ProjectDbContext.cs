@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PCStore.Domain.Entities;
-using PCStore.Persistence.Migrations;
 
 
 namespace PCStore.Persistence.Context

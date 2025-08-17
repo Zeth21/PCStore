@@ -12,8 +12,8 @@ using PCStore.Persistence.Context;
 namespace PCStore.Persistence.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    [Migration("20250624142505_ShopCarItemAdded")]
-    partial class ShopCarItemAdded
+    [Migration("20250820101457_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,34 +170,13 @@ namespace PCStore.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("BuildingNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("County")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("District")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Floor")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Neighborhood")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Street")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ZipCode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
@@ -406,7 +385,11 @@ namespace PCStore.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CouponId"));
 
-                    b.Property<DateTime>("CouponEndTime")
+                    b.Property<string>("CouponCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("CouponEndTime")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("CouponIsActive")
@@ -421,24 +404,132 @@ namespace PCStore.Persistence.Migrations
                     b.Property<int>("CouponMaxUsagePerUser")
                         .HasColumnType("int");
 
+                    b.Property<int>("CouponMinOrderAmount")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CouponStartTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("CouponTargetType")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("CouponValue")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("CouponId");
+
+                    b.HasIndex("CouponCode")
+                        .IsUnique();
 
                     b.ToTable("Coupons");
                 });
 
-            modelBuilder.Entity("PCStore.Domain.Entities.CouponUsage", b =>
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponBrand", b =>
                 {
-                    b.Property<int>("CouponUsageId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CouponUsageId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BrandId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CouponId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BrandId");
+
+                    b.HasIndex("CouponId");
+
+                    b.ToTable("CouponBrands");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CouponId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CouponId");
+
+                    b.ToTable("CouponCategories");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CouponId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CouponId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("CouponProducts");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponProductType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CouponId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CouponId");
+
+                    b.HasIndex("ProductTypeId");
+
+                    b.ToTable("CouponProductTypes");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponUsage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CouponUsageCouponId")
                         .HasColumnType("int");
@@ -446,13 +537,13 @@ namespace PCStore.Persistence.Migrations
                     b.Property<int>("CouponUsageOrderId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CouponUsageTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CouponUsageUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("CouponUsageId");
+                    b.Property<decimal>("DiscountTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CouponUsageCouponId");
 
@@ -472,44 +563,86 @@ namespace PCStore.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DiscountId"));
 
-                    b.Property<DateTime>("DiscountEndDate")
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("DiscountEndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("DiscountIsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("DiscountProductId")
-                        .HasColumnType("int");
+                    b.Property<bool>("DiscountIsPercentage")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("DiscountRateId")
-                        .HasColumnType("int");
+                    b.Property<string>("DiscountName")
+                        .IsRequired()
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
+
+                    b.Property<decimal>("DiscountRate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("DiscountStartDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("DiscountId");
 
-                    b.HasIndex("DiscountProductId");
-
-                    b.HasIndex("DiscountRateId");
-
                     b.ToTable("Discounts");
                 });
 
-            modelBuilder.Entity("PCStore.Domain.Entities.DiscountRate", b =>
+            modelBuilder.Entity("PCStore.Domain.Entities.DiscountProduct", b =>
                 {
-                    b.Property<int>("DiscountRateId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DiscountRateId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("DiscountRateNumber")
+                    b.Property<int>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("DiscountProducts");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.DiscountUsage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DiscountTotal")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("DiscountRateId");
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
 
-                    b.ToTable("DiscountRates");
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("DiscountUsages");
                 });
 
             modelBuilder.Entity("PCStore.Domain.Entities.FollowedProduct", b =>
@@ -545,6 +678,7 @@ namespace PCStore.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"));
 
                     b.Property<string>("NotificationContent")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("NotificationDate")
@@ -553,10 +687,15 @@ namespace PCStore.Persistence.Migrations
                     b.Property<bool>("NotificationStatus")
                         .HasColumnType("bit");
 
+                    b.Property<string>("NotificationTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("NotificationType")
                         .HasColumnType("int");
 
                     b.Property<string>("NotificationUserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("NotificationId");
@@ -573,9 +712,6 @@ namespace PCStore.Persistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
-
-                    b.Property<int?>("AddressId")
-                        .HasColumnType("int");
 
                     b.Property<int>("OrderAddressId")
                         .HasColumnType("int");
@@ -597,7 +733,7 @@ namespace PCStore.Persistence.Migrations
 
                     b.HasKey("OrderId");
 
-                    b.HasIndex("AddressId");
+                    b.HasIndex("OrderAddressId");
 
                     b.HasIndex("OrderUserId");
 
@@ -618,6 +754,12 @@ namespace PCStore.Persistence.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("ProductOldPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("ProductOldTotalCost")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("ProductPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -629,8 +771,7 @@ namespace PCStore.Persistence.Migrations
 
                     b.HasKey("ListId");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique();
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
@@ -656,9 +797,10 @@ namespace PCStore.Persistence.Migrations
 
                     b.HasKey("StatusId");
 
-                    b.HasIndex("OrderId");
-
                     b.HasIndex("StatusNameId");
+
+                    b.HasIndex("OrderId", "StatusNameId")
+                        .IsUnique();
 
                     b.ToTable("OrderStatuses");
                 });
@@ -871,6 +1013,7 @@ namespace PCStore.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StatusNameId"));
 
                     b.Property<string>("StatusNameString")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StatusNameId");
@@ -1087,6 +1230,82 @@ namespace PCStore.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponBrand", b =>
+                {
+                    b.HasOne("PCStore.Domain.Entities.Brand", "Brand")
+                        .WithMany("CouponBrands")
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCStore.Domain.Entities.Coupon", "Coupon")
+                        .WithMany("CouponBrands")
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brand");
+
+                    b.Navigation("Coupon");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponCategory", b =>
+                {
+                    b.HasOne("PCStore.Domain.Entities.Category", "Category")
+                        .WithMany("CouponCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCStore.Domain.Entities.Coupon", "Coupon")
+                        .WithMany("CouponCategories")
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Coupon");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponProduct", b =>
+                {
+                    b.HasOne("PCStore.Domain.Entities.Coupon", "Coupon")
+                        .WithMany("CouponProducts")
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCStore.Domain.Entities.Product", "Product")
+                        .WithMany("CouponProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coupon");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.CouponProductType", b =>
+                {
+                    b.HasOne("PCStore.Domain.Entities.Coupon", "Coupon")
+                        .WithMany("CouponProductTypes")
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCStore.Domain.Entities.ProductType", "ProductType")
+                        .WithMany()
+                        .HasForeignKey("ProductTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coupon");
+
+                    b.Navigation("ProductType");
+                });
+
             modelBuilder.Entity("PCStore.Domain.Entities.CouponUsage", b =>
                 {
                     b.HasOne("PCStore.Domain.Entities.Coupon", "Coupon")
@@ -1112,23 +1331,42 @@ namespace PCStore.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PCStore.Domain.Entities.Discount", b =>
+            modelBuilder.Entity("PCStore.Domain.Entities.DiscountProduct", b =>
                 {
+                    b.HasOne("PCStore.Domain.Entities.Discount", "Discount")
+                        .WithMany("DiscountProducts")
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PCStore.Domain.Entities.Product", "Product")
-                        .WithMany("Discounts")
-                        .HasForeignKey("DiscountProductId")
+                        .WithMany("DiscountProducts")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PCStore.Domain.Entities.DiscountRate", "DiscountRate")
-                        .WithMany("Discounts")
-                        .HasForeignKey("DiscountRateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DiscountRate");
+                    b.Navigation("Discount");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("PCStore.Domain.Entities.DiscountUsage", b =>
+                {
+                    b.HasOne("PCStore.Domain.Entities.Discount", "Discount")
+                        .WithMany("DiscountUsages")
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCStore.Domain.Entities.Order", "Order")
+                        .WithMany("DiscountUsage")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Discount");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("PCStore.Domain.Entities.FollowedProduct", b =>
@@ -1154,7 +1392,9 @@ namespace PCStore.Persistence.Migrations
                 {
                     b.HasOne("PCStore.Domain.Entities.User", "User")
                         .WithMany("Notifications")
-                        .HasForeignKey("NotificationUserId");
+                        .HasForeignKey("NotificationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -1163,7 +1403,9 @@ namespace PCStore.Persistence.Migrations
                 {
                     b.HasOne("PCStore.Domain.Entities.Address", "Address")
                         .WithMany("Orders")
-                        .HasForeignKey("AddressId");
+                        .HasForeignKey("OrderAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("PCStore.Domain.Entities.User", "User")
                         .WithMany("Orders")
@@ -1177,8 +1419,8 @@ namespace PCStore.Persistence.Migrations
             modelBuilder.Entity("PCStore.Domain.Entities.OrderProductList", b =>
                 {
                     b.HasOne("PCStore.Domain.Entities.Order", "Order")
-                        .WithOne("OrderProductList")
-                        .HasForeignKey("PCStore.Domain.Entities.OrderProductList", "OrderId")
+                        .WithMany("OrderProductList")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1341,8 +1583,15 @@ namespace PCStore.Persistence.Migrations
                     b.Navigation("ProductTypeAttributes");
                 });
 
+            modelBuilder.Entity("PCStore.Domain.Entities.Brand", b =>
+                {
+                    b.Navigation("CouponBrands");
+                });
+
             modelBuilder.Entity("PCStore.Domain.Entities.Category", b =>
                 {
+                    b.Navigation("CouponCategories");
+
                     b.Navigation("Products");
                 });
 
@@ -1355,17 +1604,29 @@ namespace PCStore.Persistence.Migrations
 
             modelBuilder.Entity("PCStore.Domain.Entities.Coupon", b =>
                 {
+                    b.Navigation("CouponBrands");
+
+                    b.Navigation("CouponCategories");
+
+                    b.Navigation("CouponProductTypes");
+
+                    b.Navigation("CouponProducts");
+
                     b.Navigation("CouponUsages");
                 });
 
-            modelBuilder.Entity("PCStore.Domain.Entities.DiscountRate", b =>
+            modelBuilder.Entity("PCStore.Domain.Entities.Discount", b =>
                 {
-                    b.Navigation("Discounts");
+                    b.Navigation("DiscountProducts");
+
+                    b.Navigation("DiscountUsages");
                 });
 
             modelBuilder.Entity("PCStore.Domain.Entities.Order", b =>
                 {
                     b.Navigation("CouponUsage");
+
+                    b.Navigation("DiscountUsage");
 
                     b.Navigation("OrderProductList");
 
@@ -1374,7 +1635,9 @@ namespace PCStore.Persistence.Migrations
 
             modelBuilder.Entity("PCStore.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("Discounts");
+                    b.Navigation("CouponProducts");
+
+                    b.Navigation("DiscountProducts");
 
                     b.Navigation("FollowedProducts");
 

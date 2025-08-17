@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -30,7 +31,8 @@ namespace PCStore.Persistence.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProfilePhoto = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gender = table.Column<byte>(type: "tinyint", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -104,9 +106,14 @@ namespace PCStore.Persistence.Migrations
                     CouponIsPercentage = table.Column<bool>(type: "bit", nullable: false),
                     CouponMaxUsage = table.Column<int>(type: "int", nullable: false),
                     CouponMaxUsagePerUser = table.Column<int>(type: "int", nullable: false),
+                    CouponMinOrderAmount = table.Column<int>(type: "int", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CouponStartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CouponEndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CouponIsActive = table.Column<bool>(type: "bit", nullable: false)
+                    CouponEndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CouponIsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CouponCode = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CouponTargetType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -114,16 +121,23 @@ namespace PCStore.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DiscountRates",
+                name: "Discounts",
                 columns: table => new
                 {
-                    DiscountRateId = table.Column<int>(type: "int", nullable: false)
+                    DiscountId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DiscountRateNumber = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    DiscountName = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DiscountStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DiscountEndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DiscountIsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DiscountIsPercentage = table.Column<bool>(type: "bit", nullable: false),
+                    DiscountRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DiscountRates", x => x.DiscountRateId);
+                    table.PrimaryKey("PK_Discounts", x => x.DiscountId);
                 });
 
             migrationBuilder.CreateTable(
@@ -145,7 +159,7 @@ namespace PCStore.Persistence.Migrations
                 {
                     StatusNameId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StatusNameString = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    StatusNameString = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -181,14 +195,7 @@ namespace PCStore.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AddressName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    County = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    District = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Neighborhood = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuildingNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Floor = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ZipCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -295,8 +302,9 @@ namespace PCStore.Persistence.Migrations
                     NotificationType = table.Column<int>(type: "int", nullable: false),
                     NotificationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NotificationStatus = table.Column<bool>(type: "bit", nullable: false),
-                    NotificationContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NotificationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    NotificationTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NotificationContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NotificationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -305,24 +313,84 @@ namespace PCStore.Persistence.Migrations
                         name: "FK_Notifications_AspNetUsers_NotificationUserId",
                         column: x => x.NotificationUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShoppingCarts",
+                name: "CouponBrands",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    BrandId = table.Column<int>(type: "int", nullable: false),
+                    CouponId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShoppingCarts", x => x.Id);
+                    table.PrimaryKey("PK_CouponBrands", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ShoppingCarts_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_CouponBrands_Brands_BrandId",
+                        column: x => x.BrandId,
+                        principalTable: "Brands",
+                        principalColumn: "BrandId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CouponBrands_Coupons_CouponId",
+                        column: x => x.CouponId,
+                        principalTable: "Coupons",
+                        principalColumn: "CouponId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CouponCategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    CouponId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CouponCategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CouponCategories_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "CategoryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CouponCategories_Coupons_CouponId",
+                        column: x => x.CouponId,
+                        principalTable: "Coupons",
+                        principalColumn: "CouponId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CouponProductTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductTypeId = table.Column<int>(type: "int", nullable: false),
+                    CouponId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CouponProductTypes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CouponProductTypes_Coupons_CouponId",
+                        column: x => x.CouponId,
+                        principalTable: "Coupons",
+                        principalColumn: "CouponId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CouponProductTypes_ProductTypes_ProductTypeId",
+                        column: x => x.ProductTypeId,
+                        principalTable: "ProductTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -338,12 +406,12 @@ namespace PCStore.Persistence.Migrations
                     ProductMainPhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProductStock = table.Column<short>(type: "smallint", nullable: false),
                     ProductBrandId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ProductCategoryId = table.Column<int>(type: "int", nullable: false),
                     ProductIsAvailable = table.Column<bool>(type: "bit", nullable: false),
                     ProductTotalRate = table.Column<int>(type: "int", nullable: false),
                     ProductRateScore = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ProductTypeId = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: true)
+                    ProductTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -355,10 +423,11 @@ namespace PCStore.Persistence.Migrations
                         principalColumn: "BrandId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Products_Categories_CategoryId",
-                        column: x => x.CategoryId,
+                        name: "FK_Products_Categories_ProductCategoryId",
+                        column: x => x.ProductCategoryId,
                         principalTable: "Categories",
-                        principalColumn: "CategoryId");
+                        principalColumn: "CategoryId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_ProductTypes_ProductTypeId",
                         column: x => x.ProductTypeId,
@@ -404,17 +473,17 @@ namespace PCStore.Persistence.Migrations
                     OrderDeliverDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     OrderIsActive = table.Column<bool>(type: "bit", nullable: false),
                     OrderAddressId = table.Column<int>(type: "int", nullable: false),
-                    OrderUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    AddressId = table.Column<int>(type: "int", nullable: true)
+                    OrderUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Orders", x => x.OrderId);
                     table.ForeignKey(
-                        name: "FK_Orders_Addresses_AddressId",
-                        column: x => x.AddressId,
+                        name: "FK_Orders_Addresses_OrderAddressId",
+                        column: x => x.OrderAddressId,
                         principalTable: "Addresses",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orders_AspNetUsers_OrderUserId",
                         column: x => x.OrderUserId,
@@ -454,29 +523,52 @@ namespace PCStore.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Discounts",
+                name: "CouponProducts",
                 columns: table => new
                 {
-                    DiscountId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DiscountStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DiscountEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DiscountIsActive = table.Column<bool>(type: "bit", nullable: false),
-                    DiscountProductId = table.Column<int>(type: "int", nullable: false),
-                    DiscountRateId = table.Column<int>(type: "int", nullable: false)
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    CouponId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Discounts", x => x.DiscountId);
+                    table.PrimaryKey("PK_CouponProducts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Discounts_DiscountRates_DiscountRateId",
-                        column: x => x.DiscountRateId,
-                        principalTable: "DiscountRates",
-                        principalColumn: "DiscountRateId",
+                        name: "FK_CouponProducts_Coupons_CouponId",
+                        column: x => x.CouponId,
+                        principalTable: "Coupons",
+                        principalColumn: "CouponId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Discounts_Products_DiscountProductId",
-                        column: x => x.DiscountProductId,
+                        name: "FK_CouponProducts_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DiscountProducts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DiscountId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiscountProducts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DiscountProducts_Discounts_DiscountId",
+                        column: x => x.DiscountId,
+                        principalTable: "Discounts",
+                        principalColumn: "DiscountId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DiscountProducts_Products_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
@@ -541,8 +633,9 @@ namespace PCStore.Persistence.Migrations
                 {
                     PhotoId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhotoProductId = table.Column<int>(type: "int", nullable: false)
+                    PhotoProductId = table.Column<int>(type: "int", nullable: false),
+                    PhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhotoName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -587,25 +680,24 @@ namespace PCStore.Persistence.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ShoppingCartId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    ItemCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ShoppingCartItems", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_ShoppingCartItems_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_ShoppingCartItems_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ShoppingCartItems_ShoppingCarts_ShoppingCartId",
-                        column: x => x.ShoppingCartId,
-                        principalTable: "ShoppingCarts",
-                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -613,16 +705,16 @@ namespace PCStore.Persistence.Migrations
                 name: "CouponUsages",
                 columns: table => new
                 {
-                    CouponUsageId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CouponUsageTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CouponUsageUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CouponUsageCouponId = table.Column<int>(type: "int", nullable: false),
-                    CouponUsageOrderId = table.Column<int>(type: "int", nullable: false)
+                    CouponUsageOrderId = table.Column<int>(type: "int", nullable: false),
+                    DiscountTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CouponUsages", x => x.CouponUsageId);
+                    table.PrimaryKey("PK_CouponUsages", x => x.Id);
                     table.ForeignKey(
                         name: "FK_CouponUsages_AspNetUsers_CouponUsageUserId",
                         column: x => x.CouponUsageUserId,
@@ -643,6 +735,33 @@ namespace PCStore.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DiscountUsages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    DiscountId = table.Column<int>(type: "int", nullable: false),
+                    DiscountTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiscountUsages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DiscountUsages_Discounts_DiscountId",
+                        column: x => x.DiscountId,
+                        principalTable: "Discounts",
+                        principalColumn: "DiscountId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DiscountUsages_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderProductLists",
                 columns: table => new
                 {
@@ -650,7 +769,10 @@ namespace PCStore.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     ProductQuantity = table.Column<byte>(type: "tinyint", nullable: false),
-                    ProductCost = table.Column<int>(type: "int", nullable: false),
+                    ProductTotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ProductPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ProductOldPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    ProductOldTotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     OrderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -864,6 +986,52 @@ namespace PCStore.Persistence.Migrations
                 column: "CommentVoteUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CouponBrands_BrandId",
+                table: "CouponBrands",
+                column: "BrandId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CouponBrands_CouponId",
+                table: "CouponBrands",
+                column: "CouponId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CouponCategories_CategoryId",
+                table: "CouponCategories",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CouponCategories_CouponId",
+                table: "CouponCategories",
+                column: "CouponId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CouponProducts_CouponId",
+                table: "CouponProducts",
+                column: "CouponId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CouponProducts_ProductId",
+                table: "CouponProducts",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CouponProductTypes_CouponId",
+                table: "CouponProductTypes",
+                column: "CouponId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CouponProductTypes_ProductTypeId",
+                table: "CouponProductTypes",
+                column: "ProductTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Coupons_CouponCode",
+                table: "Coupons",
+                column: "CouponCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CouponUsages_CouponUsageCouponId",
                 table: "CouponUsages",
                 column: "CouponUsageCouponId");
@@ -880,14 +1048,24 @@ namespace PCStore.Persistence.Migrations
                 column: "CouponUsageUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Discounts_DiscountProductId",
-                table: "Discounts",
-                column: "DiscountProductId");
+                name: "IX_DiscountProducts_DiscountId",
+                table: "DiscountProducts",
+                column: "DiscountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Discounts_DiscountRateId",
-                table: "Discounts",
-                column: "DiscountRateId");
+                name: "IX_DiscountProducts_ProductId",
+                table: "DiscountProducts",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DiscountUsages_DiscountId",
+                table: "DiscountUsages",
+                column: "DiscountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DiscountUsages_OrderId",
+                table: "DiscountUsages",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FollowedProducts_ProductId",
@@ -907,8 +1085,7 @@ namespace PCStore.Persistence.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_OrderProductLists_OrderId",
                 table: "OrderProductLists",
-                column: "OrderId",
-                unique: true);
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderProductLists_ProductId",
@@ -916,9 +1093,9 @@ namespace PCStore.Persistence.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_AddressId",
+                name: "IX_Orders_OrderAddressId",
                 table: "Orders",
-                column: "AddressId");
+                column: "OrderAddressId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_OrderUserId",
@@ -926,9 +1103,10 @@ namespace PCStore.Persistence.Migrations
                 column: "OrderUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderStatuses_OrderId",
+                name: "IX_OrderStatuses_OrderId_StatusNameId",
                 table: "OrderStatuses",
-                column: "OrderId");
+                columns: new[] { "OrderId", "StatusNameId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderStatuses_StatusNameId",
@@ -961,14 +1139,14 @@ namespace PCStore.Persistence.Migrations
                 column: "ProductRateUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_CategoryId",
-                table: "Products",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Products_ProductBrandId",
                 table: "Products",
                 column: "ProductBrandId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_ProductCategoryId",
+                table: "Products",
+                column: "ProductCategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_ProductTypeId",
@@ -991,15 +1169,9 @@ namespace PCStore.Persistence.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShoppingCartItems_ShoppingCartId",
+                name: "IX_ShoppingCartItems_UserId",
                 table: "ShoppingCartItems",
-                column: "ShoppingCartId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ShoppingCarts_UserId",
-                table: "ShoppingCarts",
-                column: "UserId",
-                unique: true);
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -1027,10 +1199,25 @@ namespace PCStore.Persistence.Migrations
                 name: "CommentVotes");
 
             migrationBuilder.DropTable(
+                name: "CouponBrands");
+
+            migrationBuilder.DropTable(
+                name: "CouponCategories");
+
+            migrationBuilder.DropTable(
+                name: "CouponProducts");
+
+            migrationBuilder.DropTable(
+                name: "CouponProductTypes");
+
+            migrationBuilder.DropTable(
                 name: "CouponUsages");
 
             migrationBuilder.DropTable(
-                name: "Discounts");
+                name: "DiscountProducts");
+
+            migrationBuilder.DropTable(
+                name: "DiscountUsages");
 
             migrationBuilder.DropTable(
                 name: "FollowedProducts");
@@ -1069,7 +1256,7 @@ namespace PCStore.Persistence.Migrations
                 name: "Coupons");
 
             migrationBuilder.DropTable(
-                name: "DiscountRates");
+                name: "Discounts");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -1079,9 +1266,6 @@ namespace PCStore.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "AttributeDefinitions");
-
-            migrationBuilder.DropTable(
-                name: "ShoppingCarts");
 
             migrationBuilder.DropTable(
                 name: "Comments");

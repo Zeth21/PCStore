@@ -413,6 +413,9 @@ namespace PCStore.Persistence.Migrations
                     b.Property<decimal>("CouponValue")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
