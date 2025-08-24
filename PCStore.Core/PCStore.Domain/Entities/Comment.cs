@@ -10,7 +10,7 @@ namespace PCStore.Domain.Entities
         public int CommentId { get; set; }
         public string? CommentText { get; set; }
         public DateTime CommentDate { get; set; } = DateTime.Now;
-        public bool CommentIsQuestion { get; set; }
+        public bool CommentIsQuestion { get; set; } 
         public string? CommentUserId { get; set; }
         public int CommentProductId { get; set; }
         public int CommentAnswerCount { get; set; } = 0;

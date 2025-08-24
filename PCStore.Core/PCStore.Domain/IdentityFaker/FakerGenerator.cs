@@ -12,10 +12,30 @@ namespace PCStore.Domain.IdentityFaker
         List<Address> IFakerGenerator.AddressGenerator(int count, List<User> users)
         {
             var result = new List<Address>();
+            var usedNames = new HashSet<string>();
+            var usedDescriptions = new HashSet<string>();
             var addressFaker = new Faker<Address>()
                 .RuleFor(a => a.UserId, f => f.PickRandom(users).Id)
-                .RuleFor(a => a.AddressName, f => f.Address.StreetName())
-                .RuleFor(a => a.Description, f => f.Address.FullAddress());
+                .RuleFor(a => a.AddressName, f =>
+                {
+                    string name;
+                    do
+                    {
+                        name = f.Address.StreetName();
+                        if (name.Length > 50) name = name.Substring(0, 50);
+                    } while (!usedNames.Add(name));
+                    return name;
+                })
+                .RuleFor(a => a.Description, f =>
+                {
+                    string desc;
+                    do
+                    {
+                        desc = f.Address.FullAddress() ?? "No Description";
+                    } while (!usedDescriptions.Add(desc));
+                    return desc;
+                });
+
             for (int i = 0; i < count; i++)
             {
                 var address = addressFaker.Generate();
@@ -28,11 +48,11 @@ namespace PCStore.Domain.IdentityFaker
         {
             var result = new List<Answer>();
             var answerFaker = new Faker<Answer>()
-                    .RuleFor(a => a.AnswerText, f => f.Lorem.Sentence(5))
-                    .RuleFor(a => a.AnswerUserId, f => f.PickRandom(users).Id)
-                    .RuleFor(a => a.AnswerCommentId, f => f.PickRandom(comments).CommentId)
-                    .RuleFor(a => a.AnswerUpVoteCount, f => f.Random.Int(0, 100))
-                    .RuleFor(a => a.AnswerDownVoteCount, f => f.Random.Int(0, 100));
+                .RuleFor(a => a.AnswerText, f => f.Lorem.Sentence(5))
+                .RuleFor(a => a.AnswerUserId, f => f.PickRandom(users).Id)
+                .RuleFor(a => a.AnswerCommentId, f => f.PickRandom(comments).CommentId)
+                .RuleFor(a => a.AnswerUpVoteCount, f => f.Random.Int(0, 100))
+                .RuleFor(a => a.AnswerDownVoteCount, f => f.Random.Int(0, 100));
             for (int i = 0; i < count; i++)
             {
                 var answer = answerFaker.Generate();
@@ -44,15 +64,26 @@ namespace PCStore.Domain.IdentityFaker
         List<AnswerVote> IFakerGenerator.AnswerVoteGenerator(int count, List<Answer> answers, List<User> users)
         {
             var result = new List<AnswerVote>();
+            var usedPairs = new HashSet<(string, int)>();
+            var random = new Random();
 
             var answerVoteFaker = new Faker<AnswerVote>()
-                .RuleFor(a => a.AnswerVoteValue, f => f.PickRandom<VoteType>())
-                .RuleFor(a => a.AnswerVoteUserId, f => f.PickRandom(users).Id)
-                .RuleFor(a => a.AnswerVoteAnswerId, f => f.PickRandom(answers).AnswerId);
+                .RuleFor(a => a.AnswerVoteValue, f => f.PickRandom<VoteType>());
 
             for (int i = 0; i < count; i++)
             {
+                string userId;
+                int answerId;
+                do
+                {
+                    userId = users[random.Next(users.Count)].Id;
+                    answerId = answers[random.Next(answers.Count)].AnswerId;
+                } while (!usedPairs.Add((userId, answerId)));
+
                 var answerVote = answerVoteFaker.Generate();
+                answerVote.AnswerVoteUserId = userId;
+                answerVote.AnswerVoteAnswerId = answerId;
+
                 result.Add(answerVote);
             }
             return result;
@@ -61,8 +92,17 @@ namespace PCStore.Domain.IdentityFaker
         List<Brand> IFakerGenerator.BrandGenerator(int count)
         {
             var result = new List<Brand>();
+            var usedNames = new HashSet<string>();
             var brandFaker = new Faker<Brand>()
-                   .RuleFor(a => a.BrandName, f => f.Company.CompanyName());
+                .RuleFor(a => a.BrandName, f =>
+                {
+                    string name;
+                    do
+                    {
+                        name = f.Company.CompanyName();
+                    } while (!usedNames.Add(name));
+                    return name;
+                });
 
             for (int i = 0; i < count; i++)
             {
@@ -72,40 +112,53 @@ namespace PCStore.Domain.IdentityFaker
             return result;
         }
 
-        List<Category> IFakerGenerator.CategoryGenerator(int rootCount, int subCount)
+        List<Category> IFakerGenerator.CategoryGenerator(int count)
         {
             var result = new List<Category>();
+            var usedNames = new HashSet<string>();
             var faker = new Faker();
+            var random = new Random();
+            int idCounter = 0;
+            int maxAttempts = 100; // Prevent infinite loop
 
-            for (int i = 0; i < rootCount; i++)
+            for (int i = 0; i < count; i++)
             {
-                var rootCategory = new Category
+                string name = null;
+                int attempts = 0;
+                do
                 {
-                    CategoryName = faker.Commerce.Categories(1)[0],
-                    ParentCategoryId = null
-                };
-                result.Add(rootCategory);
-
-                for (int j = 0; j < subCount; j++)
-                {
-                    var subCategory = new Category
+                    name = faker.Commerce.Categories(1).First();
+                    attempts++;
+                    if (attempts > maxAttempts)
                     {
-                        CategoryName = faker.Commerce.Categories(1)[0],
-                        // ParentCategoryId daha sonra atanacak (SaveChanges sonrası ID'lere ulaşınca)
-                    };
-                    result.Add(subCategory);
-                }
-            }
+                        // Fallback: generate a random name
+                        name = $"Category_{i}";
+                        break;
+                    }
+                } while (usedNames.Contains(name));
+                usedNames.Add(name);
 
+                var category = new Category
+                {
+                    CategoryName = name
+                };
+                idCounter++;
+                if (idCounter > 10 && random.NextDouble() > 0.5)
+                    category.ParentCategoryId = random.Next(1, idCounter);
+                result.Add(category);
+            }
             return result;
         }
-
 
         List<Comment> IFakerGenerator.CommentGenerator(int count, List<Product> products, List<User> users)
         {
             var result = new List<Comment>();
             var commentFaker = new Faker<Comment>()
-                .RuleFor(a => a.CommentText, f => f.Lorem.Sentence(10))
+                .RuleFor(a => a.CommentText, f =>
+                {
+                    var text = f.Lorem.Sentence(10);
+                    return text.Length > 200 ? text.Substring(0, 200) : text;
+                })
                 .RuleFor(a => a.CommentIsQuestion, f => f.Random.Bool())
                 .RuleFor(a => a.CommentUserId, f => f.PickRandom(users).Id)
                 .RuleFor(a => a.CommentProductId, f => f.PickRandom(products).ProductId)
@@ -123,13 +176,24 @@ namespace PCStore.Domain.IdentityFaker
         List<CommentVote> IFakerGenerator.CommentVoteGenerator(int count, List<Comment> comments, List<User> users)
         {
             var result = new List<CommentVote>();
+            var usedPairs = new HashSet<(string, int)>();
+            var random = new Random();
             var commentVoteFaker = new Faker<CommentVote>()
-                .RuleFor(a => a.CommentVoteValue, f => f.PickRandom<VoteType>())
-                .RuleFor(a => a.CommentVoteUserId, f => f.PickRandom(users).Id)
-                .RuleFor(a => a.CommentVoteCommentId, f => f.PickRandom(comments).CommentId);
+                .RuleFor(a => a.CommentVoteValue, f => f.PickRandom<VoteType>());
+
             for (int i = 0; i < count; i++)
             {
+                string userId;
+                int commentId;
+                do
+                {
+                    userId = users[random.Next(users.Count)].Id;
+                    commentId = comments[random.Next(comments.Count)].CommentId;
+                } while (!usedPairs.Add((userId, commentId)));
+
                 var commentVote = commentVoteFaker.Generate();
+                commentVote.CommentVoteUserId = userId;
+                commentVote.CommentVoteCommentId = commentId;
                 result.Add(commentVote);
             }
             return result;
@@ -140,9 +204,17 @@ namespace PCStore.Domain.IdentityFaker
             var result = new List<Notification>();
             var notificationFaker = new Faker<Notification>()
                 .RuleFor(a => a.NotificationType, f => f.PickRandom<NotifType>())
-                .RuleFor(a => a.NotificationTitle, f => f.Hacker.Phrase())
+                .RuleFor(a => a.NotificationTitle, f =>
+                {
+                    var title = f.Hacker.Phrase();
+                    return title.Length > 100 ? title.Substring(0, 100) : title;
+                })
                 .RuleFor(a => a.NotificationStatus, f => f.Random.Bool())
-                .RuleFor(a => a.NotificationContent, f => f.Lorem.Paragraph(2))
+                .RuleFor(a => a.NotificationContent, f =>
+                {
+                    var content = f.Lorem.Paragraph(2);
+                    return content.Length > 500 ? content.Substring(0, 500) : content;
+                })
                 .RuleFor(a => a.NotificationUserId, f => f.PickRandom(users).Id);
             for (int i = 0; i < count; i++)
             {
@@ -160,7 +232,7 @@ namespace PCStore.Domain.IdentityFaker
                 .RuleFor(a => a.OrderIsActive, f => f.Random.Bool())
                 .RuleFor(a => a.OrderAddressId, f => f.PickRandom(addresses).Id)
                 .RuleFor(a => a.OrderUserId, f => f.PickRandom(users).Id);
-            for (int i = 0; i <= count - 1; i++)
+            for (int i = 0; i < count; i++)
             {
                 var order = orderFaker.Generate();
                 result.Add(order);
@@ -168,21 +240,24 @@ namespace PCStore.Domain.IdentityFaker
             return result;
         }
 
-
-
         List<ProductPhoto> IFakerGenerator.ProductPhotoGenerator(List<Product> products)
         {
             var result = new List<ProductPhoto>();
-            for (int i = 0; i <= products.Count - 2; i++)
+            var usedNames = new HashSet<string>();
+            for (int i = 0; i < products.Count; i++)
             {
-                for (int j = 0; j <= 4; j++)
+                for (int j = 0; j < 5; j++)
                 {
+                    string photoName;
+                    do
+                    {
+                        photoName = $"{products[i].ProductId}_Photo_{j}";
+                    } while (!usedNames.Add(photoName));
                     var photo = new ProductPhoto
                     {
-                        PhotoPath = i.ToString() + ".Photo" + j.ToString(),
-                        PhotoName = i.ToString() + ".Photo" + j.ToString(),
+                        PhotoPath = photoName,
+                        PhotoName = photoName,
                         PhotoProductId = products[i].ProductId
-
                     };
                     result.Add(photo);
                 }
@@ -193,42 +268,55 @@ namespace PCStore.Domain.IdentityFaker
         List<ProductRate> IFakerGenerator.ProductRateGenerator(List<Product> products, List<User> users)
         {
             var result = new List<ProductRate>();
+            var usedPairs = new HashSet<(string, int)>();
             var rnd = new Random();
             var rateFaker = new Faker<ProductRate>()
                 .RuleFor(a => a.ProductRateScore, f => f.Random.Decimal(0, 10))
                 .RuleFor(a => a.ProductRateUserId, f => f.PickRandom(users).Id);
-            for (int i = 0; i <= products.Count - 1; i++)
+            for (int i = 0; i < products.Count; i++)
             {
-                for (int j = 0; j <= rnd.Next(5, 20) - 1; j++)
+                int rateCount = rnd.Next(5, 20);
+                for (int j = 0; j < rateCount; j++)
                 {
+                    string userId = users[rnd.Next(users.Count)].Id;
+                    int productId = products[i].ProductId;
+                    if (!usedPairs.Add((userId, productId))) continue;
                     var rate = rateFaker.Generate();
-                    rate.ProductRateProductId = products[i].ProductId;
+                    rate.ProductRateProductId = productId;
+                    rate.ProductRateUserId = userId;
                     result.Add(rate);
                 }
             }
             return result;
         }
 
-
         List<User> IFakerGenerator.UserGenerator(int count)
         {
             var result = new List<User>();
+            var usedUserNames = new HashSet<string>();
+            var usedEmails = new HashSet<string>();
             var userFaker = new Faker<User>()
-                .RuleFor(a => a.Name, f => f.Person.UserName)
-                .RuleFor(a => a.Surname, f => f.Person.UserName)
-                .RuleFor(a => a.UserName, f => f.Person.UserName)
-                .RuleFor(a => a.Email, f => f.Person.Email)
+                .RuleFor(a => a.Name, f => f.Person.FirstName)
+                .RuleFor(a => a.Surname, f => f.Person.LastName)
+                .RuleFor(a => a.UserName, f =>
+                {
+                    string userName;
+                    do
+                    {
+                        userName = f.Internet.UserName();
+                    } while (!usedUserNames.Add(userName));
+                    return userName;
+                })
+                .RuleFor(a => a.Email, f =>
+                {
+                    string email;
+                    do
+                    {
+                        email = f.Internet.Email();
+                    } while (!usedEmails.Add(email));
+                    return email;
+                })
                 .RuleFor(a => a.PhoneNumber, f => f.Phone.PhoneNumber());
-
-            //var customer = new User
-            //{
-            //    Name = "Customer",
-            //    Surname = "Customer",
-            //    Email = "customer@example.com",
-            //    UserName = "Customer",
-            //    EmailConfirmed = true
-            //};
-            //result.Add(customer);
 
             for (int i = 0; i < count; i++)
             {
@@ -241,8 +329,17 @@ namespace PCStore.Domain.IdentityFaker
         List<Product> IFakerGenerator.ProductGenerator(int count, List<Brand> brands, List<Category> categories, List<ProductType> productTypes)
         {
             var result = new List<Product>();
+            var usedNames = new HashSet<string>();
             var productFaker = new Faker<Product>()
-                .RuleFor(a => a.ProductName, f => f.Commerce.ProductName())
+                .RuleFor(a => a.ProductName, f =>
+                {
+                    string name;
+                    do
+                    {
+                        name = f.Commerce.ProductName();
+                    } while (!usedNames.Add(name));
+                    return name;
+                })
                 .RuleFor(a => a.ProductPrice, f => f.Random.Decimal(1500, 10000))
                 .RuleFor(a => a.ProductStock, f => (short)f.Random.Int(0, 99))
                 .RuleFor(a => a.ProductBrandId, f => f.PickRandom(brands).BrandId)
@@ -351,7 +448,7 @@ namespace PCStore.Domain.IdentityFaker
     // Laptop
     new() { Name = "CPUModel", DataType = "string", IsRequired = true },
     new() { Name = "GPUModel", DataType = "string", IsRequired = false },
-    new() { Name = "ScreenSizeInch", DataType = "float", IsRequired = true, Unit = "inch" },
+    new() { Name = "LaptopSize", DataType = "float", IsRequired = true, Unit = "inch" },
     new() { Name = "RAMCapacityGB", DataType = "int", IsRequired = true, Unit = "GB" },
     new() { Name = "StorageType", DataType = "string", IsRequired = true }
 };
@@ -403,19 +500,11 @@ namespace PCStore.Domain.IdentityFaker
             return productTypeAttributes;
         }
 
-        public string GenerateAttributeValue(AttributeDefinition attributeDefinition)
-        {
-            return attributeDefinition.DataType switch
-            {
-                "string" => new Faker().Commerce.ProductName(),
-                "int" => new Faker().Random.Int(1, 100).ToString(),
-                "float" => new Faker().Random.Float(1, 10).ToString("F2"),
-                _ => string.Empty
-            };
-        }
+
         public List<ProductAttribute> ProductAttributeGenerator(List<Product> products, List<ProductTypeAttribute> productTypeAttributes, List<AttributeDefinition> attributeDefinitions)
         {
             var result = new List<ProductAttribute>();
+            var usedPairs = new HashSet<(int, int)>();
             foreach (var product in products)
             {
                 var attrIds = productTypeAttributes
@@ -424,6 +513,7 @@ namespace PCStore.Domain.IdentityFaker
                     .ToList();
                 foreach (var attrId in attrIds)
                 {
+                    if (!usedPairs.Add((attrId, product.ProductId))) continue;
                     var attrDef = attributeDefinitions.FirstOrDefault(x => x.Id == attrId);
                     if (attrDef is not null)
                     {
@@ -440,14 +530,27 @@ namespace PCStore.Domain.IdentityFaker
             return result;
         }
 
+        public string GenerateAttributeValue(AttributeDefinition attributeDefinition)
+        {
+            return attributeDefinition.DataType switch
+            {
+                "string" => new Faker().Commerce.ProductName(),
+                "int" => new Faker().Random.Int(1, 100).ToString(),
+                "float" => new Faker().Random.Float(1, 10).ToString("F2"),
+                _ => string.Empty
+            };
+        }
+
         public List<Coupon> CouponGenerator(int count)
         {
+            var result = new List<Coupon>();
+            var usedCodes = new HashSet<string>();
             var couponFaker = new Faker<Coupon>()
                 .RuleFor(c => c.CouponIsPercentage, f => f.Random.Bool())
                 .RuleFor(c => c.CouponValue, (f, c) =>
                     c.CouponIsPercentage
-                        ? f.Random.Decimal(5, 30)
-                        : f.Random.Decimal(250, 1000))
+                        ? Math.Round(f.Random.Decimal(5, 30), 2)
+                        : Math.Round(f.Random.Decimal(250, 1000), 2))
                 .RuleFor(c => c.CouponMaxUsage, f => f.Random.Int(50, 500))
                 .RuleFor(c => c.CouponMaxUsagePerUser, f => f.Random.Int(1, 5))
                 .RuleFor(c => c.CouponMinOrderAmount, f => f.Random.Int(100, 1000))
@@ -458,18 +561,39 @@ namespace PCStore.Domain.IdentityFaker
                     c.CouponIsActive
                         ? DateTime.Now.AddDays(f.Random.Int(1, 60))
                         : DateTime.Now.AddDays(f.Random.Int(-60, -1)))
-                .RuleFor(c => c.Description, f => f.Commerce.ProductDescription())
-                .RuleFor(c => c.CouponCode, f => f.Random.AlphaNumeric(10).ToUpper())
+                .RuleFor(c => c.Description, f =>
+                {
+                    var desc = f.Commerce.ProductDescription();
+                    return desc.Length > 200 ? desc.Substring(0, 200) : desc;
+                })
+                .RuleFor(c => c.CouponCode, f =>
+                {
+                    string code;
+                    do
+                    {
+                        code = f.Random.AlphaNumeric(10).ToUpper();
+                    } while (!usedCodes.Add(code));
+                    return code;
+                })
                 .RuleFor(c => c.CouponTargetType, f => f.PickRandom<CouponTargetType>());
-            List<Coupon> result = new List<Coupon>();
             result = couponFaker.Generate(count);
             return result;
         }
 
         public List<Discount> DiscountGenerator(int count)
         {
+            var result = new List<Discount>();
+            var usedNames = new HashSet<string>();
             var discountFaker = new Faker<Discount>()
-                .RuleFor(d => d.DiscountName, f => f.Commerce.Categories(1)[0])
+                .RuleFor(d => d.DiscountName, f =>
+                {
+                    string name;
+                    do
+                    {
+                        name = f.Commerce.Categories(1)[0];
+                    } while (!usedNames.Add(name));
+                    return name;
+                })
                 .RuleFor(d => d.CreateDate, f => f.Date.Past(1))
                 .RuleFor(d => d.DiscountIsActive, f => f.Random.Bool(0.85f))
                 .RuleFor(d => d.DiscountStartDate, (f, d) => d.CreateDate.AddDays(f.Random.Int(0, 10)))
@@ -480,11 +604,9 @@ namespace PCStore.Domain.IdentityFaker
                 .RuleFor(d => d.DiscountIsPercentage, f => f.Random.Bool())
                 .RuleFor(d => d.DiscountRate, (f, d) =>
                     d.DiscountIsPercentage
-                        ? f.Random.Decimal(5, 30)
-                        : f.Random.Decimal(250, 1000))
+                        ? Math.Round(f.Random.Decimal(5, 30), 2)
+                        : Math.Round(f.Random.Decimal(250, 1000), 2))
                 .RuleFor(d => d.Description, f => f.Commerce.ProductDescription());
-
-            var result = new List<Discount>();
             result = discountFaker.Generate(count);
             return result;
         }
@@ -492,18 +614,15 @@ namespace PCStore.Domain.IdentityFaker
         public List<CouponProduct> CouponProductGenerator(List<int> CouponIds, List<int> ProductIds)
         {
             var result = new List<CouponProduct>();
-            var availableProducts = new List<int>(ProductIds);
-
+            var usedPairs = new HashSet<(int, int)>();
             foreach (var couponId in CouponIds)
             {
                 int count = Random.Shared.Next(3, 8);
-
-                for (int j = 0; j < count && availableProducts.Count > 0; j++)
+                for (int j = 0; j < count; j++)
                 {
-                    int randIndex = Random.Shared.Next(0, availableProducts.Count);
-                    int productId = availableProducts[randIndex];
-                    availableProducts.RemoveAt(randIndex);
-
+                    if (ProductIds.Count == 0) break;
+                    int productId = ProductIds[Random.Shared.Next(ProductIds.Count)];
+                    if (!usedPairs.Add((couponId, productId))) continue;
                     result.Add(new CouponProduct
                     {
                         CouponId = couponId,
@@ -511,29 +630,26 @@ namespace PCStore.Domain.IdentityFaker
                     });
                 }
             }
-
             return result;
         }
-
 
         public List<CouponBrand> CouponBrandGenerator(List<int> CouponIds, List<int> BrandIds)
         {
             var result = new List<CouponBrand>();
-            var availableBrands = new List<int>(BrandIds);
-            foreach (var id in CouponIds)
+            var usedPairs = new HashSet<(int, int)>();
+            foreach (var couponId in CouponIds)
             {
-                var i = Random.Shared.Next(1, 4);
-                for (int j = 0; j < i; j++)
+                int count = Random.Shared.Next(1, 4);
+                for (int j = 0; j < count; j++)
                 {
-                    var randIndex = Random.Shared.Next(0, availableBrands.Count);
-                    var randBrandId = availableBrands[randIndex];
-                    availableBrands.RemoveAt(randIndex);
-                    var newRecord = new CouponBrand
+                    if (BrandIds.Count == 0) break;
+                    int brandId = BrandIds[Random.Shared.Next(BrandIds.Count)];
+                    if (!usedPairs.Add((couponId, brandId))) continue;
+                    result.Add(new CouponBrand
                     {
-                        CouponId = id,
-                        BrandId = randBrandId
-                    };
-                    result.Add(newRecord);
+                        CouponId = couponId,
+                        BrandId = brandId
+                    });
                 }
             }
             return result;
@@ -542,21 +658,20 @@ namespace PCStore.Domain.IdentityFaker
         public List<CouponCategory> CouponCategoriesGenerator(List<int> CouponIds, List<int> CategoryIds)
         {
             var result = new List<CouponCategory>();
-            var availableCategories = new List<int>(CategoryIds);
-            foreach (var id in CouponIds)
+            var usedPairs = new HashSet<(int, int)>();
+            foreach (var couponId in CouponIds)
             {
-                var i = Random.Shared.Next(1, 4);
-                for (int j = 0; j < i; j++)
+                int count = Random.Shared.Next(1, 4);
+                for (int j = 0; j < count; j++)
                 {
-                    var randIndex = Random.Shared.Next(0, availableCategories.Count);
-                    var randCategoryId = availableCategories[randIndex];
-                    availableCategories.RemoveAt(randIndex);
-                    var newRecord = new CouponCategory
+                    if (CategoryIds.Count == 0) break;
+                    int categoryId = CategoryIds[Random.Shared.Next(CategoryIds.Count)];
+                    if (!usedPairs.Add((couponId, categoryId))) continue;
+                    result.Add(new CouponCategory
                     {
-                        CouponId = id,
-                        CategoryId = randCategoryId
-                    };
-                    result.Add(newRecord);
+                        CouponId = couponId,
+                        CategoryId = categoryId
+                    });
                 }
             }
             return result;
@@ -565,18 +680,21 @@ namespace PCStore.Domain.IdentityFaker
         public List<CouponProductType> CouponProductTypeGenerator(List<int> CouponIds, List<int> TypeIds)
         {
             var result = new List<CouponProductType>();
-            var availableTypeIds = new List<int>(TypeIds);
-            foreach (var id in CouponIds)
+            var usedPairs = new HashSet<(int, int)>();
+            foreach (var couponId in CouponIds)
             {
-                var randIndex = Random.Shared.Next(0, availableTypeIds.Count);
-                var randTypeId = availableTypeIds[randIndex];
-                availableTypeIds.RemoveAt(randIndex);
-                var newRecord = new CouponProductType
+                int count = Random.Shared.Next(1, 4);
+                for (int j = 0; j < count; j++)
                 {
-                    CouponId = id,
-                    ProductTypeId = randTypeId
-                };
-                result.Add(newRecord);
+                    if (TypeIds.Count == 0) break;
+                    int typeId = TypeIds[Random.Shared.Next(TypeIds.Count)];
+                    if (!usedPairs.Add((couponId, typeId))) continue;
+                    result.Add(new CouponProductType
+                    {
+                        CouponId = couponId,
+                        ProductTypeId = typeId
+                    });
+                }
             }
             return result;
         }
@@ -584,21 +702,20 @@ namespace PCStore.Domain.IdentityFaker
         public List<DiscountProduct> DiscountProductGenerator(List<int> DiscountIds, List<int> ProductIds)
         {
             var result = new List<DiscountProduct>();
-            var availableProducts = new List<int>(ProductIds);
-            foreach (var id in DiscountIds)
+            var usedPairs = new HashSet<(int, int)>();
+            foreach (var discountId in DiscountIds)
             {
-                var i = Random.Shared.Next(5, 11);
-                for (int j = 0; j < i; j++)
+                int count = Random.Shared.Next(5, 11);
+                for (int j = 0; j < count; j++)
                 {
-                    var randomIndex = Random.Shared.Next(0, availableProducts.Count);
-                    var randomProductId = ProductIds[randomIndex];
-                    availableProducts.RemoveAt(randomIndex);
-                    var newRecord = new DiscountProduct
+                    if (ProductIds.Count == 0) break;
+                    int productId = ProductIds[Random.Shared.Next(ProductIds.Count)];
+                    if (!usedPairs.Add((discountId, productId))) continue;
+                    result.Add(new DiscountProduct
                     {
-                        DiscountId = id,
-                        ProductId = randomProductId
-                    };
-                    result.Add(newRecord);
+                        DiscountId = discountId,
+                        ProductId = productId
+                    });
                 }
             }
             return result;
@@ -607,21 +724,20 @@ namespace PCStore.Domain.IdentityFaker
         public List<FollowedProduct> FollowedProductGenerator(List<string> UserIds, List<int> ProductIds)
         {
             var result = new List<FollowedProduct>();
-            foreach (var id in UserIds)
+            var usedPairs = new HashSet<(string, int)>();
+            foreach (var userId in UserIds)
             {
-                var availableProducts = new List<int>(ProductIds);
-                var i = Random.Shared.Next(1, 6);
-                for (int k = 0; k < i; k++)
+                int count = Random.Shared.Next(1, 6);
+                for (int k = 0; k < count; k++)
                 {
-                    var randomIndex = Random.Shared.Next(0, availableProducts.Count);
-                    var randomProductId = availableProducts[randomIndex];
-                    availableProducts.RemoveAt(randomIndex);
-                    var newRecord = new FollowedProduct
+                    if (ProductIds.Count == 0) break;
+                    int productId = ProductIds[Random.Shared.Next(ProductIds.Count)];
+                    if (!usedPairs.Add((userId, productId))) continue;
+                    result.Add(new FollowedProduct
                     {
-                        UserId = id,
-                        ProductId = randomProductId
-                    };
-                    result.Add(newRecord);
+                        UserId = userId,
+                        ProductId = productId
+                    });
                 }
             }
             return result;
@@ -630,22 +746,21 @@ namespace PCStore.Domain.IdentityFaker
         public List<ShoppingCartItem> ShoppingCartItemGenerator(List<string> UserIds, List<int> ProductIds)
         {
             var result = new List<ShoppingCartItem>();
-            foreach (var id in UserIds)
+            var usedPairs = new HashSet<(string, int)>();
+            foreach (var userId in UserIds)
             {
-                var availableProducts = new List<int>(ProductIds);
-                var i = Random.Shared.Next(1, 4);
-                for (var k = 0; k < i; k++)
+                int count = Random.Shared.Next(1, 4);
+                for (int k = 0; k < count; k++)
                 {
-                    var randomIndex = Random.Shared.Next(0, availableProducts.Count);
-                    var randomProductId = availableProducts[randomIndex];
-                    availableProducts.RemoveAt(randomIndex);
-                    var newRecord = new ShoppingCartItem
+                    if (ProductIds.Count == 0) break;
+                    int productId = ProductIds[Random.Shared.Next(ProductIds.Count)];
+                    if (!usedPairs.Add((userId, productId))) continue;
+                    result.Add(new ShoppingCartItem
                     {
-                        UserId = id,
-                        ProductId = randomProductId,
+                        UserId = userId,
+                        ProductId = productId,
                         ItemCount = Random.Shared.Next(1, 3)
-                    };
-                    result.Add(newRecord);
+                    });
                 }
             }
             return result;
@@ -654,6 +769,7 @@ namespace PCStore.Domain.IdentityFaker
         public List<StatusName> StatusNameGenerator()
         {
             var result = new List<StatusName>();
+            var usedNames = new HashSet<string>();
             var statusList = new List<string>
             {
                 "Pending",
@@ -663,28 +779,33 @@ namespace PCStore.Domain.IdentityFaker
                 "Delivered",
                 "Cancelled"
             };
-            foreach (var status in statusList) 
+            foreach (var status in statusList)
             {
-                var newRecord = new StatusName
+                if (usedNames.Add(status))
                 {
-                    StatusNameString = status
-                };
-                result.Add(newRecord);
+                    var newRecord = new StatusName
+                    {
+                        StatusNameString = status
+                    };
+                    result.Add(newRecord);
+                }
             }
             return result;
         }
 
-        public List<OrderStatus> OrderStatusGenerator(List<Order> Orders) 
+        public List<OrderStatus> OrderStatusGenerator(List<Order> Orders)
         {
             var result = new List<OrderStatus>();
-            foreach(var order in Orders) 
+            var usedPairs = new HashSet<(int, int)>();
+            foreach (var order in Orders)
             {
                 int timeCounter = -1;
-                var i = Random.Shared.Next(1,7);
-                for(int j = 1; j <= i; j++) 
+                var i = Random.Shared.Next(1, 7);
+                for (int j = 1; j <= i; j++)
                 {
                     if (i == 6 && j == 5)
                         continue;
+                    if (!usedPairs.Add((order.OrderId, j))) continue;
                     var newRecord = new OrderStatus
                     {
                         OrderId = order.OrderId,

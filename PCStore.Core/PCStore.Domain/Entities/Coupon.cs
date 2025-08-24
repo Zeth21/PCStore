@@ -11,8 +11,14 @@ namespace PCStore.Domain.Entities
         public int CouponId { get; set; }
         public decimal CouponValue { get; set; }
         public bool CouponIsPercentage { get; set; } = false;
+        
+        [Range(1, int.MaxValue)]
         public int CouponMaxUsage { get; set; }
+
+        [Range(1, int.MaxValue)]
         public int CouponMaxUsagePerUser { get; set; } = 1;
+
+        [Range(0, int.MaxValue)]
         public int CouponMinOrderAmount { get; set; } = 0;
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime CouponStartTime { get; set; } = DateTime.Now;

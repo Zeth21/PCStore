@@ -20,6 +20,7 @@ namespace PCStore.Domain.Entities
         [ForeignKey("Product")]
         public required int ProductId { get; set; }
 
+        [Range(1,int.MaxValue)]
         public int ItemCount { get; set; } = 1;
 
         public Product? Product { get; set; }

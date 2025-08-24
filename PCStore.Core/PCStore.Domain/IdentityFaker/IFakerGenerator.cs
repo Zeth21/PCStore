@@ -8,7 +8,7 @@ namespace PCStore.Domain.IdentityFaker
         List<Answer> AnswerGenerator(int count, List<Comment> comments, List<User> users);
         List<AnswerVote> AnswerVoteGenerator(int count, List<Answer> answers, List<User> users);
         List<Brand> BrandGenerator(int count);
-        List<Category> CategoryGenerator(int rootCount, int subCount);
+        List<Category> CategoryGenerator(int count);
         List<Comment> CommentGenerator(int count, List<Product> products, List<User> users);
         List<CommentVote> CommentVoteGenerator(int count, List<Comment> comments, List<User> users);
 

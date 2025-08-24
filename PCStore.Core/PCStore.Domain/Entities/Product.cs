@@ -9,10 +9,10 @@ namespace PCStore.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ProductId { get; set; }
         public required string ProductName { get; set; }
-        [Column(TypeName = "smallmoney")]
         public required decimal ProductPrice { get; set; }
         public string? ProductMainPhotoPath { get; set; }
-        public short ProductStock { get; set; }
+        [Range(0,short.MaxValue)]
+        public short ProductStock { get; set; } = 0;
         public int ProductBrandId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int ProductCategoryId { get; set; }

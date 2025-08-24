@@ -8,6 +8,7 @@ namespace PCStore.Domain.Entities
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ListId { get; set; }
         public int ProductId { get; set; }
+        [Range(1,byte.MaxValue)]
         public byte ProductQuantity { get; set; }
         public decimal ProductTotalCost { get; set; }
         public decimal ProductPrice { get; set; }

@@ -8,6 +8,7 @@ namespace PCStore.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ProductRateId { get; set; }
+        [Range(1,10)]
         public decimal ProductRateScore { get; set; }
         public string? ProductRateUserId { get; set; }
         public int ProductRateProductId { get; set; }

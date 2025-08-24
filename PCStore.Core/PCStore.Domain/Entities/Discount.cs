@@ -16,7 +16,10 @@ namespace PCStore.Domain.Entities
         public DateTime? DiscountEndDate { get; set; }
         public bool DiscountIsActive { get; set; } = true;
         public bool DiscountIsPercentage { get; set; } = true;
+
+        [Range(1,int.MaxValue)]
         public decimal DiscountRate { get; set; }
+
         [MaxLength(200)]
         public required string Description { get; set; }
         public ICollection<DiscountProduct>? DiscountProducts { get; set; }

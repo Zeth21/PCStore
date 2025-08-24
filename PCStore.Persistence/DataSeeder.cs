@@ -35,7 +35,7 @@ namespace PCStore.Persistence
                     _projectDbContext.Brands.AddRange(brands);
                     await _projectDbContext.SaveChangesAsync();
 
-                    var categories = _faker.CategoryGenerator(2, 10);
+                    var categories = _faker.CategoryGenerator(30);
                     _projectDbContext.Categories.AddRange(categories);
                     await _projectDbContext.SaveChangesAsync();
 
