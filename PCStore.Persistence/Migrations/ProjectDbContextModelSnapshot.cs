@@ -206,7 +206,8 @@ namespace PCStore.Persistence.Migrations
 
                     b.Property<string>("AnswerText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("AnswerUpVoteCount")
                         .HasColumnType("int");

@@ -20,8 +20,8 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.OrderStatusHan
                 .Where(x => x.OrderId == request.OrderId
                 && x.OrderUserId == request.UserId
                 && x.OrderIsActive)
-                .AnyAsync(cancellationToken);
-            if (!order)
+                .SingleOrDefaultAsync(cancellationToken);
+            if (order is null)
                 return Result.Fail("Order not found!");
             var newStatus = new OrderStatus
             {
@@ -31,6 +31,7 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Handlers.OrderStatusHan
             };
             try 
             {
+                order.OrderIsActive = false;
                 await context.OrderStatuses.AddAsync(newStatus,cancellationToken);
                 var task = await context.SaveChangesAsync(cancellationToken);
                 if (task <= 0)

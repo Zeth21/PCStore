@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.AddressCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Queries.AddressQueries;
 using PCStore.Application.Features.CQRSDesignPattern.Results.AddressResults;
+using PCStore.Application.Features.CQRSDesignPattern.Validators.AddressValidators;
 using PCStore.Application.Services.AddressService;
 using System.Security.Claims;
 
@@ -17,6 +18,17 @@ namespace PCStore.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAddress([FromBody] CreateAddressCommand request, CancellationToken cancellation = default) 
         {
+            var validator = new CreateAddressValidator();
+            var validationResult = await validator.ValidateAsync(request);
+            if (!validationResult.IsValid) 
+            {
+                foreach (var failure in validationResult.Errors)
+                {
+                    ModelState.AddModelError(failure.PropertyName, failure.ErrorMessage);
+                }
+                return BadRequest(ModelState);
+            }
+
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId is null)
                 return Unauthorized();

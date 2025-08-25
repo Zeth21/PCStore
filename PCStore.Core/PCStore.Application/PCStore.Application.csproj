@@ -7,19 +7,34 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Features\CQRSDesignPattern\Commands\StatusNameCommands\**" />
+    <Compile Remove="Features\CQRSDesignPattern\Queries\ProductAttributeQueries\**" />
+    <Compile Remove="Features\CQRSDesignPattern\Queries\ProductRateQueries\**" />
+    <Compile Remove="Features\CQRSDesignPattern\Queries\ProductTypeAttributeQueries\**" />
+    <Compile Remove="Features\CQRSDesignPattern\Queries\ProductTypeQueries\**" />
+    <Compile Remove="Features\CQRSDesignPattern\Queries\StatusNameQueries\**" />
+    <EmbeddedResource Remove="Features\CQRSDesignPattern\Commands\StatusNameCommands\**" />
+    <EmbeddedResource Remove="Features\CQRSDesignPattern\Queries\ProductAttributeQueries\**" />
+    <EmbeddedResource Remove="Features\CQRSDesignPattern\Queries\ProductRateQueries\**" />
+    <EmbeddedResource Remove="Features\CQRSDesignPattern\Queries\ProductTypeAttributeQueries\**" />
+    <EmbeddedResource Remove="Features\CQRSDesignPattern\Queries\ProductTypeQueries\**" />
+    <EmbeddedResource Remove="Features\CQRSDesignPattern\Queries\StatusNameQueries\**" />
+    <None Remove="Features\CQRSDesignPattern\Commands\StatusNameCommands\**" />
+    <None Remove="Features\CQRSDesignPattern\Queries\ProductAttributeQueries\**" />
+    <None Remove="Features\CQRSDesignPattern\Queries\ProductRateQueries\**" />
+    <None Remove="Features\CQRSDesignPattern\Queries\ProductTypeAttributeQueries\**" />
+    <None Remove="Features\CQRSDesignPattern\Queries\ProductTypeQueries\**" />
+    <None Remove="Features\CQRSDesignPattern\Queries\StatusNameQueries\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\PCStore.Persistence\PCStore.Persistence.csproj" />
     <ProjectReference Include="..\PCStore.Domain\PCStore.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\CQRSDesignPattern\Commands\StatusNameCommands\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\StatusNameHandlers\" />
     <Folder Include="Features\CQRSDesignPattern\Handlers\ProductRateHandlers\" />
-    <Folder Include="Features\CQRSDesignPattern\Queries\ProductAttributeQueries\" />
-    <Folder Include="Features\CQRSDesignPattern\Queries\ProductTypeAttributeQueries\" />
-    <Folder Include="Features\CQRSDesignPattern\Queries\ProductTypeQueries\" />
-    <Folder Include="Features\CQRSDesignPattern\Queries\StatusNameQueries\" />
-    <Folder Include="Features\CQRSDesignPattern\Queries\ProductRateQueries\" />
     <Folder Include="Features\CQRSDesignPattern\Results\ProductTypeAttributeResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\StatusNameResults\" />
     <Folder Include="Features\CQRSDesignPattern\Results\ProductRateResults\" />
@@ -27,6 +42,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="MediatR" Version="12.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
   </ItemGroup>

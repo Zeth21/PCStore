@@ -172,5 +172,11 @@ namespace PCStore.Application.Services.OrderService
             var result = await mediator.Send(request, cancellation);
             return result;
         }
+
+        public async Task<Result> CancelOrder(UserCancelOrderStatusCommand request, CancellationToken cancellation)
+        {
+            var result = await mediator.Send(request, cancellation);
+            return result;
+        }
     }
 }

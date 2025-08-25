@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PCStore.Application.Features.CQRSDesignPattern.Commands.CommentCommands;
 using PCStore.Application.Features.CQRSDesignPattern.Queries.CommentQueries;
 using PCStore.Application.Services.CommentService;
+using System.Security.Claims;
 
 namespace PCStore.API.Controllers
 {
@@ -27,24 +29,39 @@ namespace PCStore.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveComment([FromRoute] int id, [FromBody] string userId, CancellationToken cancellation = default) 
+        public async Task<IActionResult> RemoveComment([FromRoute] int id, CancellationToken cancellation = default) 
         {
-            var request = new RemoveCommentCommand { CommentId = id, UserId = userId };
+            var request = new RemoveCommentCommand { CommentId = id };
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                return Unauthorized();
+            request.UserId = userId;
             var result = await _commentService.RemoveComment(request,cancellation);
             return StatusCode(result.StatusCode,result.Message);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPost]
         public async Task<IActionResult> CreateComment([FromBody] CreateCommentCommand request,CancellationToken cancellation = default) 
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                return Unauthorized();
+            request.CommentUserId = userId;
             var result = await _commentService.CreateComment(request,cancellation);
             return StatusCode(result.StatusCode,result);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPut]
         public async Task<IActionResult> UpdateComment([FromBody] UpdateCommentCommand request, CancellationToken cancellation = default) 
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                return Unauthorized();
+            request.CommentUserId = userId;
             var result = await _commentService.UpdateComment(request, cancellation);
             return StatusCode(result.StatusCode,result);
         }

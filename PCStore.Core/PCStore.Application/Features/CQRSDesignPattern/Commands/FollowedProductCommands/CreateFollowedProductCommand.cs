@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace PCStore.Application.Features.CQRSDesignPattern.Commands.FollowedProductCommands
@@ -12,6 +13,7 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Commands.FollowedProduc
     public class CreateFollowedProductCommand : IRequest<TaskResult<CreateFollowedProductResult>>
     {
         public int ProductId { get; set; }
-        public required string UserId { get; set; }
+        [JsonIgnore]
+        public string? UserId { get; set; } = "";
     }
 }

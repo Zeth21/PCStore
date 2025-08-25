@@ -4,13 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace PCStore.Application.Features.CQRSDesignPattern.Commands.FollowedProductCommands
 {
     public class RemoveFollowedProductCommand : IRequest<Result>
     {
-        public required string UserId { get; set; }
+        [JsonIgnore]
+        public string? UserId { get; set; } = "";
         public int Id { get; set; }
     }
 }

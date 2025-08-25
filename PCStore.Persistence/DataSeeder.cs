@@ -69,6 +69,7 @@ namespace PCStore.Persistence
                     foreach (var user in users)
                     {
                         await _userManager.CreateAsync(user, "Test1234!");
+                        await _userManager.AddToRoleAsync(user, "Customer");
                     }
 
                     var addresses = _faker.AddressGenerator(100, users);

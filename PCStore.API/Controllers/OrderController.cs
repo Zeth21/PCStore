@@ -61,5 +61,17 @@ namespace PCStore.API.Controllers
             var result = await service.CreateOrderStatus(request, cancellation);
             return StatusCode(result.StatusCode, result);
         }
+
+        [Authorize(Roles = "Customer")]
+        [HttpPost("cancel/{orderId}")]
+        public async Task<IActionResult> CancelOrder([FromRoute] int orderId, CancellationToken cancellation = default)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                return Unauthorized();
+            var request = new UserCancelOrderStatusCommand { UserId = userId, OrderId = orderId };
+            var result = await service.CancelOrder(request, cancellation);
+            return StatusCode(result.StatusCode, result);
+        }
     }
 }

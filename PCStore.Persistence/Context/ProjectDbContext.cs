@@ -59,6 +59,11 @@ namespace PCStore.Persistence.Context
             });
 
             //ANSWER AYARLARI
+            modelBuilder.Entity<Answer>(entity => 
+            {
+                entity.Property(a => a.AnswerText)
+                .HasMaxLength(200);
+            });
 
             //ANSWERVOTE AYARLARI
             modelBuilder.Entity<AnswerVote>(entity => 
@@ -72,6 +77,9 @@ namespace PCStore.Persistence.Context
             {
                 entity.HasIndex(ad => ad.Name)
                 .IsUnique();
+
+                entity.Property(ad => ad.Name)
+                .HasMaxLength(50);
             });
 
             //BRAND AYARLARI

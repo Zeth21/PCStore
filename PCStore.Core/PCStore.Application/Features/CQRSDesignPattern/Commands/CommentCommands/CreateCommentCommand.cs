@@ -9,7 +9,9 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Commands.CommentCommand
     {
         public required string CommentText { get; set; }
         public bool CommentIsQuestion { get; set; } = false;
-        public required string CommentUserId { get; set; }
+
+        [JsonIgnore]
+        public string? CommentUserId { get; set; } = "";
         public int CommentProductId { get; set; }
 
     }

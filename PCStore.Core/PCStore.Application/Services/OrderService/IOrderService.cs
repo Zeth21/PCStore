@@ -21,7 +21,8 @@ namespace PCStore.Application.Services.OrderService
         Task<TaskResult<ServiceGetOrderDetailsByOrderIdResult>> UserGetOrderById(ServiceGetOrderDetailsByOrderIdCommand request, CancellationToken cancellation);
         Task<TaskListResult<UserGetOrderListResult>> UserGetOrderList(UserGetOrderListQuery request, CancellationToken cancellation);
 
-
+        Task<Result> CancelOrder(UserCancelOrderStatusCommand request, CancellationToken cancellation);
+        
         //ORDERSTATUS
         Task<TaskResult<CreateOrderStatusResult>> CreateOrderStatus(CreateOrderStatusCommand request, CancellationToken cancellation);
         Task<TaskListResult<ListGetOrderStatusByOrderIdResult>> GetOrderStatusList(ListGetOrderStatusByOrderIdQuery request, CancellationToken cancellation);

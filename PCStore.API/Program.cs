@@ -176,9 +176,9 @@ using (var scope = app.Services.CreateScope())
     var seeder2 = scope.ServiceProvider.GetRequiredService<ISeedData>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    await seeder.Seed();
     await seeder2.SeedRolesAsync(roleManager);
     await seeder2.SeedUsersAsync(userManager);
+    await seeder.Seed();
 }
 
 

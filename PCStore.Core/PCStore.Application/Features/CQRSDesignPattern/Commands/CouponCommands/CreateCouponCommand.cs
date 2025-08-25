@@ -10,9 +10,9 @@ namespace PCStore.Application.Features.CQRSDesignPattern.Commands.CouponCommands
     {
         public decimal CouponValue { get; set; }
         public bool CouponIsPercentage { get; set; }
-        public int CouponMaxUsage { get; set; }
-        public int CouponMaxUsagePerUser { get; set; }
-        public int CouponMinOrderAmount { get; set; }
+        public int CouponMaxUsage { get; set; } = 100;
+        public int CouponMaxUsagePerUser { get; set; } = 1;
+        public int CouponMinOrderAmount { get; set; } = 0;
 
         [JsonIgnore]
         public DateTime CouponStartTime { get; set; } = DateTime.Now;
