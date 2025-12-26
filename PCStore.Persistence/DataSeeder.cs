@@ -104,8 +104,6 @@ namespace PCStore.Persistence
                     _projectDbContext.AnswerVotes.AddRange(answervotes);
                     await _projectDbContext.SaveChangesAsync();
 
-                    //EKLENENLER
-
                     var coupons = _faker.CouponGenerator(25);
                     _projectDbContext.Coupons.AddRange(coupons);
                     await _projectDbContext.SaveChangesAsync();
@@ -159,6 +157,25 @@ namespace PCStore.Persistence
                     var orderStatus = _faker.OrderStatusGenerator(orders);
                     _projectDbContext.OrderStatuses.AddRange(orderStatus);
                     await _projectDbContext.SaveChangesAsync();
+
+                    var orderProductLists = _faker.OrderProductListGenerator(orders, products);
+                    _projectDbContext.OrderProductLists.AddRange(orderProductLists);
+                    await _projectDbContext.SaveChangesAsync();
+
+                    //Setting order total prices
+                    foreach (var order in orders)
+                    {
+                        var orderProducts = orderProductLists.Where(x => x.OrderId == order.OrderId).ToList();
+                        decimal total = 0;
+                        foreach (var op in orderProducts)
+                        {
+                            total += op.ProductTotalCost * op.ProductQuantity;
+                        }
+                        order.OrderTotalCost = total;
+                    }
+                    await _projectDbContext.SaveChangesAsync();
+
+
 
                     await transaction.CommitAsync();
                 }

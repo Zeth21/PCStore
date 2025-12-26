@@ -119,7 +119,7 @@ namespace PCStore.Domain.IdentityFaker
             var faker = new Faker();
             var random = new Random();
             int idCounter = 0;
-            int maxAttempts = 100; // Prevent infinite loop
+            int maxAttempts = 100;
 
             for (int i = 0; i < count; i++)
             {
@@ -131,7 +131,6 @@ namespace PCStore.Domain.IdentityFaker
                     attempts++;
                     if (attempts > maxAttempts)
                     {
-                        // Fallback: generate a random name
                         name = $"Category_{i}";
                         break;
                     }
@@ -228,13 +227,13 @@ namespace PCStore.Domain.IdentityFaker
         {
             var result = new List<Order>();
             var orderFaker = new Faker<Order>()
-                .RuleFor(a => a.OrderTotalCost, f => 0)
-                .RuleFor(a => a.OrderIsActive, f => f.Random.Bool())
-                .RuleFor(a => a.OrderAddressId, f => f.PickRandom(addresses).Id)
-                .RuleFor(a => a.OrderUserId, f => f.PickRandom(users).Id);
+                .RuleFor(a => a.OrderIsActive, f => f.Random.Bool());
             for (int i = 0; i < count; i++)
             {
+                var user = new Faker().PickRandom(users);
                 var order = orderFaker.Generate();
+                order.OrderAddressId = new Faker().PickRandom(user.Addresses).Id;
+                order.OrderUserId = user.Id;
                 result.Add(order);
             }
             return result;
@@ -813,6 +812,35 @@ namespace PCStore.Domain.IdentityFaker
                         StatusNameId = j
                     };
                     result.Add(newRecord);
+                }
+            }
+            return result;
+        }
+
+        public List<OrderProductList> OrderProductListGenerator(List<Order> orders, List<Product> products)
+        {
+            var result = new List<OrderProductList>();
+            var usedPairs = new HashSet<(int, int)>();
+            var random = new Random();
+            foreach(var order in orders) 
+            {
+                for (int i = 0; i < random.Next(1, 6); i++)
+                {
+                    int productId;
+                    do
+                    {
+                        productId = products[random.Next(products.Count)].ProductId;
+                    } while (!usedPairs.Add((order.OrderId, productId)));
+                    var quantity = random.Next(1, 5);
+                    var orderProduct = new OrderProductList
+                    {
+                        OrderId = order.OrderId,
+                        ProductId = productId,
+                        ProductQuantity = (byte)quantity,
+                        ProductPrice = products.First(p => p.ProductId == productId).ProductPrice,
+                        ProductTotalCost = products.First(p => p.ProductId == productId).ProductPrice * quantity
+                    };
+                    result.Add(orderProduct);
                 }
             }
             return result;

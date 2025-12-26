@@ -45,8 +45,8 @@ namespace PCStore.Domain.IdentityFaker
 
 
         // Eksik generatorlar
+        List<OrderProductList> OrderProductListGenerator(List<Order> orders, List<Product> products);
         //List<CouponUsage> CouponUsageGenerator(int count, List<Coupon> coupons, List<User> users);
-        //List<OrderProductList> OrderProductListGenerator(int count, List<Order> orders, List<Product> products);
         //List<DiscountUsage> DiscountUsageGenerator(int count, List<Discount> discounts, List<User> users);
 
     }

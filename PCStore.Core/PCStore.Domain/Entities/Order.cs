@@ -8,7 +8,7 @@ namespace PCStore.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int OrderId { get; set; }
-        public decimal OrderTotalCost { get; set; }
+        public decimal? OrderTotalCost { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.Now;
         public DateTime? OrderDeliverDate { get; set; }
         public bool OrderIsActive { get; set; }
